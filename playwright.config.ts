@@ -22,15 +22,29 @@ export default defineConfig({
     video: 'on-first-retry',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    /**
+     * The demo environment serves a certificate from a private CA
+     * (`DifferentLab TLS CA (sales)`) that Chromium rejects outright. This is
+     * a property of the sandbox, not of the product — see README.
+     */
+    ignoreHTTPSErrors: true,
   },
   projects: [
     {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
+      grepInvert: /@mobile/,
     },
     {
       name: 'mobile',
       use: { ...devices['Pixel 7'] },
+      dependencies: ['setup'],
       grep: /@mobile/,
     },
   ],

@@ -7,3 +7,4 @@ blob-report/
 .auth/
 *.log
 .achilles/
+.playwright-cli/
