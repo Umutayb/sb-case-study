@@ -53,6 +53,39 @@ The suite runs identically either way. CI uses `--ignore-scripts`.
 
 ---
 
+## What is covered
+
+13 tests across three Playwright projects (`setup`, `chromium`, `mobile`).
+Each one is here because it covers a distinct way the flow can break, not to
+inflate a count.
+
+### Signup and onboarding
+
+| Scenario | What it protects |
+|---|---|
+| A new trial account reaches the dashboard | The flow the brief names. Registration → 8-step questionnaire → setup wizard → dashboard, including asserting the first-run dialog is genuinely dismissed. |
+| The registration form hands off to the questionnaire | The handoff is invisible in the URL — `/signup` stays put — so it needs its own assertion on the content that replaces the form. |
+| The registration form is usable on a mobile viewport `@mobile` | Narrow-viewport layout is where signup forms break first. Deliberately not a full mobile questionnaire walk — see below. |
+
+### Login
+
+| Scenario | What it protects |
+|---|---|
+| Valid credentials reach the dashboard | The flow the brief names. |
+| Login is offered MFA before the dashboard | The `/login/mfa-promote` interstitial is part of the journey; if it vanished, login would have changed shape. |
+| An empty submit reports both required fields | The submit handler must block, and must not navigate. |
+| A wrong password is rejected | Must fail closed with the documented message. |
+| An unknown email is rejected | The other half of failing closed. |
+| Rejection does not reveal whether the account exists | Asserts the wrong-password and unknown-account messages are *identical*, so the form cannot be used as an account-enumeration oracle. |
+| A logged-out visitor cannot reach the dashboard directly | Route guarding, approached from outside. |
+
+### Session
+
+| Scenario | What it protects |
+|---|---|
+| An authenticated session survives a reload | Token persistence — the top post-login regression. Asserts the dashboard still renders, not merely that the URL held. |
+| The dashboard exposes the primary navigation | A cheap structural check that the landing surface is actually the dashboard. |
+
 ## How the account problem is solved
 
 Login needs an account, and committing credentials is not an option. So the
@@ -146,6 +179,10 @@ Stated so the omissions read as decisions rather than gaps:
   line; on a shared demo environment three browsers buy little for the runtime.
 - **Visual regression.** No stable baseline story on an environment that resets
   and whose trial banner counts down.
+- **A full mobile walk of the questionnaire.** The mobile project checks the
+  registration form only. Re-walking eight questionnaire steps on a second
+  device profile would roughly double the suite's runtime to re-prove logic
+  the desktop run already covers.
 - **Load and performance.** Out of scope for a functional brief, and impolite
   on someone else's demo box.
 
