@@ -24,8 +24,24 @@ npm test
 That is the whole setup. **No `.env` is required** — verified by cloning this
 repository fresh and running it with no configuration at all.
 
-`npm run test:report` opens the HTML report; `npm run test:headed` watches it
-run.
+`npm run test:report` opens the HTML report.
+
+### Watching it run
+
+```bash
+npm run test:headed        # or: npx playwright test --headed
+```
+
+A headed run switches to a single worker and paces each action by 250ms, so
+the flows are actually followable instead of several browser windows racing
+each other. Both entry points behave identically — the config detects the
+`--headed` flag itself. Adjust the pace with `SLOW_MO`:
+
+```bash
+SLOW_MO=600 npm run test:headed
+```
+
+`npm run test:debug` adds the Playwright inspector on top.
 
 ### Optional configuration
 

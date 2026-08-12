@@ -9,7 +9,8 @@
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:report": "playwright show-report",
-    "test:repair": "achilles-self-repair"
+    "test:repair": "achilles-self-repair",
+    "test:debug": "playwright test --headed --debug"
   },
   "author": "",
   "license": "ISC",
