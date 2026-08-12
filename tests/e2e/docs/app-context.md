@@ -52,13 +52,23 @@ a "Log in" link to `/login`.
 3. "What do you need Shiftbase to handle?" — multi-select checkboxes.
 4. "What are you using now?" — single select.
 5. "Pick what's most painful right now." — single select.
-6. "What's this problem costing you right now?" — single select.
+6. "What's this problem costing you right now?" — **multi-select**, despite
+   reading like the single-select steps around it.
 7. "What's the main reason you're looking for a solution right now?" — single select.
 8. "When would you like this sorted out?" — single select.
 
-**States:** `Next` is disabled until the step's required inputs are set.
-Radio inputs do not respond to a click on the input itself — the clickable
-target is the adjacent label element.
+**States:** `Next` is disabled until the step's required inputs are set. Every
+questionnaire step also carries a `Back` button, so the wizard is navigable in
+both directions. Radio inputs do not respond to a click on the input itself —
+they are `class="peer sr-only"`, and the clickable target is the adjacent
+label element.
+
+**Known defect — email uniqueness is not enforced.** Registering with an email
+that already has an account is accepted with no conflict error, proceeds
+through the entire questionnaire and wizard, and reaches the dashboard. The
+password chosen during that second registration is then rejected at login,
+while the original account's password continues to work. Covered by
+`tests/e2e/signup-duplicate-email.spec.ts` (marked `fixme`).
 
 **Navigation:** Reached from `/login`; hands off to `/onboarding`.
 
@@ -109,6 +119,38 @@ to login" button.
 
 **Note for tests:** this screen sits between login and the dashboard, so any
 "log in and land on the dashboard" assertion has to pass through it.
+
+**Branch behaviour (mapped in Phase 4):**
+- "Set up now" → `/login/mfa-setup`, a full TOTP enrolment screen (QR code,
+  secret, password and code fields) with a "Skip for now" escape hatch.
+- "Remind me later" → dashboard; the prompt returns on the next login.
+- "Don't ask again" → dashboard, and the prompt is durably suppressed for that
+  account on all future logins.
+- **"Back to login" terminates the session** rather than navigating back — it
+  is a logout in disguise, which is worth knowing before writing a test that
+  treats it as a passive back-link.
+
+## ForgotPasswordPage — `/login/forgot`
+
+**Purpose:** Password recovery request.
+
+**Behaviour:** Returns the same "Check your email" confirmation for a
+registered address and an unknown one, so like the login form it does not leak
+account existence. Out of scope for this suite (outside both named flows), but
+mapped for completeness.
+
+## Other routes observed
+
+- `/logout` — ends the session.
+- `/dashboard/my-schedule`, `/dashboard/my-hours`, `/dashboard/my-absence`,
+  `/dashboard/my-plus-minus` — the "My items" sub-pages of the dashboard.
+- Primary navigation leads to `/schedule/...`, `/timesheet/...`, `/employees`,
+  `/reports`, `/insights`, `/communications` — all out of scope per the brief.
+
+**Route guarding works in both directions:** unauthenticated requests to
+`/dashboard/my-overview` and `/login/mfa-promote` redirect to `/login`, and an
+already-authenticated session requesting `/signup` or `/login` is redirected to
+the dashboard.
 
 ## DashboardPage — `/dashboard/my-overview`
 

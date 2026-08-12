@@ -9,7 +9,7 @@ import 'dotenv/config';
 const headed = process.argv.includes('--headed') || Boolean(process.env.HEADED);
 
 /** Pace of a headed run, in ms per action. Override with SLOW_MO. */
-const slowMo = Number(process.env.SLOW_MO ?? 250);
+const slowMo = Number(process.env.SLOW_MO ?? 1000);
 
 /**
  * The suite targets a hosted Shiftbase demo environment, so there is no

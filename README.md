@@ -32,7 +32,7 @@ repository fresh and running it with no configuration at all.
 npm run test:headed        # or: npx playwright test --headed
 ```
 
-A headed run switches to a single worker and paces each action by 250ms, so
+A headed run switches to a single worker and paces each action by 1000ms, so
 the flows are actually followable instead of several browser windows racing
 each other. Both entry points behave identically — the config detects the
 `--headed` flag itself. Adjust the pace with `SLOW_MO`:
@@ -158,6 +158,31 @@ ever did, that flow would become untestable by design — the right response is 
 loud failure and a conversation about a test-mode key, not a workaround.
 
 ---
+
+## A defect found while building this
+
+**Signup does not enforce email uniqueness, and fails silently.** Reproduced
+on the demo environment on 2026-08-12:
+
+1. Register with an email address that already has an account. The form
+   accepts it — no "already in use" error, on the form or anywhere later.
+2. The flow continues into the questionnaire and setup wizard exactly like a
+   genuine registration, and reaches the dashboard.
+3. The password chosen during that second registration is then **rejected at
+   login**.
+4. The original account's password still works.
+
+So a user who has forgotten they already signed up will re-register, choose a
+new password, complete all eight questionnaire steps and the setup wizard —
+and then be unable to log in with the password they just set, with nothing
+having told them anything went wrong.
+
+`tests/e2e/signup-duplicate-email.spec.ts` describes the behaviour the product
+*should* have. Both tests are marked `test.fixme`, so they document the defect
+without failing the suite; deleting the `fixme` markers turns them into the
+regression guard once it is fixed. They were not rewritten to assert the buggy
+behaviour — a test suite that adjusts itself to match a bug stops being able
+to detect it.
 
 ## Selector strategy
 
