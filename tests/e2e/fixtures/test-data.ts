@@ -9,6 +9,8 @@ export class Routes {
   static readonly SIGNUP = '/signup';
   static readonly LOGIN = '/login';
   static readonly FORGOT_PASSWORD = '/login/forgot';
+  static readonly LOGOUT = '/logout';
+  static readonly DASHBOARD = '/dashboard/my-overview';
 }
 
 /**

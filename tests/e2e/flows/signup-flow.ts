@@ -92,10 +92,18 @@ export async function completeQuestionnaire(steps: Steps, user: TestUser): Promi
   await steps.fill('numberOfEmployees', QUIZ, user.employeeCount);
   await clickNextWhenEnabled(steps);
 
-  // Step 2 — business type reveals industry, which reveals role.
+  // Step 2 — business type reveals industry, which reveals role. Subject to
+  // the same re-render race documented on selectAnswerAndAdvance below: any
+  // of the three reveals can have its click land mid re-render and get lost,
+  // leaving Next disabled. Re-assert all three once before giving up.
   await steps.click('businessTypeOption', QUIZ);
   await steps.click('industryOption', QUIZ);
   await steps.click('buyerRoleOption', QUIZ);
+  if (!(await nextBecomesEnabled(steps))) {
+    await steps.click('businessTypeOption', QUIZ);
+    await steps.click('industryOption', QUIZ);
+    await steps.click('buyerRoleOption', QUIZ);
+  }
   await clickNextWhenEnabled(steps);
 
   // Step 3 — needs (multi-select).

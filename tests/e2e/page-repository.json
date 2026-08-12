@@ -270,6 +270,20 @@
           "selector": {
             "text": "Password is required"
           }
+        },
+        {
+          "elementName": "keepLoggedInCheckbox",
+          "selector": {
+            "role": "checkbox",
+            "name": "Keep me logged in"
+          }
+        },
+        {
+          "elementName": "forgotPasswordLink",
+          "selector": {
+            "role": "link",
+            "name": "Forgot password?"
+          }
         }
       ]
     },
@@ -305,6 +319,13 @@
               "regex": "Don.t ask again",
               "flags": "i"
             }
+          }
+        },
+        {
+          "elementName": "backToLoginButton",
+          "selector": {
+            "role": "button",
+            "name": "Back to login"
           }
         }
       ]
@@ -381,6 +402,13 @@
           "elementName": "firstRunDialogClose",
           "selector": {
             "css": "[role='dialog'] button[aria-label='Close'], [role='dialog'] button:has-text('Close')"
+          }
+        },
+        {
+          "elementName": "addWorkedHoursButton",
+          "selector": {
+            "role": "button",
+            "name": "Add Worked Hours"
           }
         }
       ]

@@ -36,3 +36,15 @@ export async function logInToDashboard(
   await dismissMfaPrompt(steps);
   await steps.waitForUrl(UrlPattern.DASHBOARD_AFTER_LOGIN, undefined, { timeout: 30000 });
 }
+
+/**
+ * Ends the current session via the real `/logout` route and waits for the
+ * bounce back to `/login`. `/logout` itself is outside both named journeys,
+ * but it is the one reliable way to end a session as test setup/teardown
+ * without relying on the MFA-promote "Back to login" button — which is
+ * itself under test as a *surprising* logout, not a routine one.
+ */
+export async function logOut(steps: Steps): Promise<void> {
+  await steps.navigateTo(Routes.LOGOUT, { waitUntil: 'domcontentloaded' });
+  await steps.waitForUrl(UrlPattern.LOGIN, undefined, { timeout: 20000 });
+}
