@@ -1,10 +1,17 @@
 node_modules/
 .env
-docs/
+
+# Internal process notes (design spec, implementation plan) — local only.
+/docs/
+
+# Authoring-time tooling, not part of the deliverable.
+.claude/
+.achilles/
+.playwright/
+.playwright-cli/
+
 test-results/
 playwright-report/
 blob-report/
-.auth/
+tests/e2e/.auth/
 *.log
-.achilles/
-.playwright-cli/
