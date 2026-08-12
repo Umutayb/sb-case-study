@@ -92,7 +92,9 @@ that already has an account is accepted with no conflict error, proceeds
 through the entire questionnaire and wizard, and reaches the dashboard. The
 password chosen during that second registration is then rejected at login,
 while the original account's password continues to work. Covered by
-`tests/e2e/signup-duplicate-email.spec.ts` (marked `fixme`).
+`tests/e2e/signup-duplicate-email.spec.ts`, which is tagged `@known-defect`
+and **fails on purpose** — it describes the behaviour the product should have,
+so it becomes the regression guard unchanged once the defect is fixed.
 
 **Navigation:** Reached from `/login`; hands off to `/onboarding`.
 
