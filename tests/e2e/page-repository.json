@@ -152,6 +152,12 @@
           }
         },
         {
+          "elementName": "needsCheckedOption",
+          "selector": {
+            "css": "[formcontrolname='buyer_intent'] input:checked"
+          }
+        },
+        {
           "elementName": "situationOption",
           "selector": {
             "css": "[formcontrolname='situation'] input[value='situation_spreadsheets'] + label"

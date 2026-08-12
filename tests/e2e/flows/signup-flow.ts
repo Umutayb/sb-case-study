@@ -90,6 +90,11 @@ export async function completeQuestionnaire(steps: Steps, user: TestUser): Promi
   await steps.verifyPresence('businessName', QUIZ);
   await steps.fill('businessName', QUIZ, user.businessName);
   await steps.fill('numberOfEmployees', QUIZ, user.employeeCount);
+  // Confirm both values actually landed — a fill lost to the same re-render
+  // race leaves Next disabled and produces a 30s timeout that reads as a
+  // mystery rather than as "the field was empty".
+  await steps.verifyInputValue('businessName', QUIZ, user.businessName);
+  await steps.verifyInputValue('numberOfEmployees', QUIZ, user.employeeCount);
   await clickNextWhenEnabled(steps);
 
   // Step 2 — business type reveals industry, which reveals role. Subject to
@@ -106,9 +111,17 @@ export async function completeQuestionnaire(steps: Steps, user: TestUser): Promi
   }
   await clickNextWhenEnabled(steps);
 
-  // Step 3 — needs (multi-select).
+  // Step 3 — needs (multi-select). Same lost-click race, but the re-assert
+  // has to be state-aware: these are checkboxes, so blindly clicking again
+  // would UNCHECK a selection that did land and make things worse. Only
+  // re-click when nothing at all is checked.
   await steps.click('needSchedulingOption', QUIZ);
   await steps.click('needTimeTrackingOption', QUIZ);
+  if (!(await nextBecomesEnabled(steps))) {
+    if ((await steps.getCount('needsCheckedOption', QUIZ)) === 0) {
+      await steps.click('needSchedulingOption', QUIZ);
+    }
+  }
   await clickNextWhenEnabled(steps);
 
   // Steps 4-8 — one single-select answer each.

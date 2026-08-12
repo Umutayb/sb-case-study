@@ -71,7 +71,7 @@ The suite runs identically either way. CI uses `--ignore-scripts`.
 
 ## What is covered
 
-22 passing tests across three Playwright projects (`setup`, `chromium`,
+23 passing tests across three Playwright projects (`setup`, `chromium`,
 `mobile`), plus 3 that fail on purpose against confirmed defects. Each one is
 here because it covers a distinct way the flow can break, not to inflate a
 count.
@@ -238,7 +238,7 @@ To run without them:
 npm run test:no-defects        # or: npx playwright test --grep-invert @known-defect
 ```
 
-Expected results today: **22 passed, 3 failed** on a full run; **22 passed** with
+Expected results today: **23 passed, 3 failed** on a full run; **23 passed** with
 the known-defect tests excluded.
 
 One implementation note, since the first version of this test got it wrong:

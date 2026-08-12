@@ -171,11 +171,13 @@ test.describe('Login — session and MFA-branch edges', () => {
     await logInToDashboard(steps, user.email, user.password);
     await steps.verifyPresence('mySchedulePanel', DASHBOARD);
 
-    const hasWorkedHoursCta = await steps.isPresent('addWorkedHoursButton', DASHBOARD);
-    test.skip(
-      !hasWorkedHoursCta,
-      'no "Add Worked Hours" CTA present on this account state — nothing to trigger the API call with',
-    );
+    // Asserted, not skipped-on-absence. A runtime `test.skip` here would mean
+    // that the day this CTA moves or disappears, the stale-session behaviour
+    // silently stops being tested and the suite still reports green. If the
+    // dashboard no longer offers this action, that is a change worth failing
+    // on — either the app moved, or this test needs a different API-bound
+    // trigger. Both deserve a human's attention.
+    await steps.verifyPresence('addWorkedHoursButton', DASHBOARD);
 
     // Simulate the stale session without reloading — the SPA stays exactly
     // as rendered while the cookie disappears out from under it.

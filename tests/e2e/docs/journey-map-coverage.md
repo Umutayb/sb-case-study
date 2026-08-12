@@ -5,11 +5,20 @@ Companion to `tests/e2e/docs/journey-map.md`. Maps every authored journey
 its authored `Test expectations` / supporting assertions, or `<missing>`
 where no spec exists yet. Two journeys, both P0: j-signup-onboard, j-login.
 
-**Suite snapshot:** 18 passing tests across `signup.spec.ts`,
-`signup-validation.spec.ts`, `login.spec.ts`, `login-negative.spec.ts`,
-`session.spec.ts`; 3 tests failing on purpose (`@known-defect`) in
-`signup-duplicate-email.spec.ts` and `router-malformed-modal.spec.ts`,
-tracking confirmed product defects.
+**Suite snapshot (re-derived from `npx playwright test --list` + spec
+reading, not taken on trust):** 8 spec files — `signup.spec.ts`,
+`signup-validation.spec.ts`, `signup-duplicate-email.spec.ts`,
+`router-malformed-modal.spec.ts`, `login.spec.ts`, `login-negative.spec.ts`,
+`login-session-edges.spec.ts`, `session.spec.ts` — plus one setup file
+(`setup/account.setup.ts`). 25 tests total: **22 passing** (21 functional
+tests + the account-setup test) and **3 failing on purpose**
+(`@known-defect`: 2 in `signup-duplicate-email.spec.ts`, 1 in
+`router-malformed-modal.spec.ts`), each tracking a confirmed product defect
+— not a coverage gap or a broken test, and each becomes an unchanged
+regression guard once the underlying defect is fixed. The breadth sweep
+recorded in `coverage-expansion-state.json` landed 9 of these tests since
+the prior version of this document: 5 in `signup-validation.spec.ts`, 4 in
+`login-session-edges.spec.ts`.
 
 ## j-signup-onboard
 
@@ -40,15 +49,19 @@ tracking confirmed product defects.
 | Error state — logged-out direct dashboard access redirects | `login-negative.spec.ts` › "a logged-out visitor cannot reach the dashboard directly" | Covered |
 | Supporting: session survives reload | `session.spec.ts` › "an authenticated session survives a reload" | Covered |
 | Supporting: primary navigation present post-login | `session.spec.ts` › "the dashboard exposes the primary navigation" | Covered |
+| Error state — "Back to login" silently terminates the session | `login-session-edges.spec.ts` › "\"Back to login\" on the MFA prompt silently terminates the session" | Covered |
+| Edge case — concurrent sessions permitted | `login-session-edges.spec.ts` › "logging out of one session does not affect a concurrent session for the same account" | Covered |
+| Edge case — stale/cookie-invalidated session redirects gracefully mid-interaction | `login-session-edges.spec.ts` › "a session invalidated mid-interaction redirects to login instead of hanging or blanking" — see `## Residual Risk`: this test conditionally skips at runtime (`test.skip(!hasWorkedHoursCta, ...)`) when the shared test account's dashboard has no "Add Worked Hours" CTA to trigger the API call | Covered† |
+| Mobile: yes (login form) | `login-session-edges.spec.ts` › "the login form is usable on a mobile viewport `@mobile`" | Covered |
 | Error state — MFA "Set up now" wrong-code alert | — | `<missing>` |
-| Error state — "Back to login" silently terminates the session | — | `<missing>` |
-| Edge case — concurrent sessions permitted | — | `<missing>` |
-| Edge case — stale/cookie-invalidated session redirects gracefully mid-interaction | — | `<missing>` |
 | Edge case — MFA-promote reachable via direct nav mid-session | — | `<missing>` |
-| Mobile: yes (login form) | — | `<missing>` |
 | Performance baseline | — | `<missing>` |
 
-**Journey coverage: 8/15 authored expectations covered.**
+**Journey coverage: 12/15 authored expectations covered.**
+
+†Assertion is real (not a placeholder), but its execution is conditional on
+live account state at run time — flagged under `## Residual Risk` rather
+than silently counted as unconditionally verified.
 
 *Note: the malformed-dashboard-modal defect (j-signup-onboard's Edge case) is auth-state-independent and was confirmed to reproduce on an authenticated session reached via login too. `router-malformed-modal.spec.ts` covers it once; no separate login-specific repro is listed as missing here.*
 
@@ -87,9 +100,48 @@ future coverage-expansion backlog for this project.
 | Journey | Priority | Expectations authored | Covered | Missing |
 |---|---|---|---|---|
 | j-signup-onboard | P0 | 10 | 6 | 4 |
-| j-login | P0 | 15 | 8 | 7 |
+| j-login | P0 | 15 | 12 | 3 |
 
-14/25 authored expectations covered across the two in-scope P0 journeys.
-The remaining 11 gaps are itemized in `journey-map.md`'s `## Coverage Plan`
-— not a full re-composition, since both journeys' core happy paths and most
-error states are already built and passing.
+18/25 authored expectations covered across the two in-scope P0 journeys
+(72%). **P0 hard gate: not met.** Per the journey-mapping skill's Phase 5
+hard gate, a P0 journey below 100% of its authored expectations means the
+suite is not complete — reported plainly rather than rounded up:
+j-signup-onboard is at 60% (6/10) and j-login is at 80% (12/15). Neither
+reaches the 100% bar. The breadth sweep (`coverage-expansion-state.json`)
+closed 4 of the 7 gaps that existed at the prior checkpoint (all 5
+signup-validation expectations were already closed before that sweep; the
+sweep itself closed the "Back to login" session-termination, concurrent-session,
+stale-cookie-session, and login-mobile gaps). The remaining 7 gaps — 4 on
+j-signup-onboard, 3 on j-login — are itemized above and in
+`journey-map.md`'s `## Coverage Plan`; 6 of those 7 rows are accounted for
+by the 5 deliberately-deferred expectations (not silently dropped) listed
+in `## Residual Risk` below, sourced from `coverage-expansion-state.json`'s
+`residualRisk.deferredExpectations` — the performance-baseline entry there
+covers both journeys' rows, which is why 5 deferred-list entries account
+for 6 gap rows. One gap (j-signup-onboard's wizard-progress-loss-on-back/forward
+edge case) has no deferral record at all — it is a plain open gap, not a
+deliberately-deferred one.
+
+## Residual Risk
+
+The five sources required by the journey-mapping skill's Phase 5 checkpoint,
+plus one project-specific source (this project's breadth-sweep recorded its
+own deferred-expectations block, and the task brief requires it land here
+rather than vanish into the green summary above).
+
+| Source | Count | Journey IDs / details |
+|---|---|---|
+| Gated Areas not mapped (journey-map `## Gated Areas (Not Mapped)`) | 0 | — (journey-map.md: "None. Signup is open ... no admin role, paid tier, or externally-issued credential" was required to reach either journey's exit) |
+| Adversarial opt-outs (`adversarialSkippedJourneys[]`) | 0 | — (`coverage-expansion-state.json`: `adversarialSkippedJourneys: []`; breadth mode runs no adversarial passes by design, so there is nothing to opt out of) |
+| Blocked journeys (`blocked-cycle-exhausted` / `blocked-cycle-stalled`) with unresolved `final_must_fix` | 0 | — (both breadth-sweep dispatches in `coverage-expansion-state.json` report `"result": "new-tests-landed"`, `"review_status": "greenlight"`, `"final_must_fix": []`) |
+| Ambiguous ledger findings | 0 | — (no findings ledger with ambiguous/needs-review status exists for this project; `.ledger-integrity.json` is a file-hash integrity log, not a findings ledger, and contains no ambiguous entries) |
+| Structural-only / skipped-placeholder tests | 1 | j-login — `tests/e2e/login-session-edges.spec.ts:164` "a session invalidated mid-interaction redirects to login instead of hanging or blanking". Not a placeholder (it carries real assertions), but it conditionally skips at runtime via `test.skip(!hasWorkedHoursCta, ...)` when the shared test account's dashboard lacks an "Add Worked Hours" CTA to trigger the API call the assertion depends on — so its coverage of the edge case is conditional on live account state, not unconditionally guaranteed on every run. |
+| Deferred expectations (`coverage-expansion-state.json` › `residualRisk.deferredExpectations`, project-specific, additive to the skill's five canonical sources) | 5 | j-login: MFA "Set up now" wrong-code alert (no TOTP-generation helper built — tooling gap, not a credentials gate); MFA-promote reachable via direct nav mid-session. j-signup-onboard: 300-char first name breaks the questionnaire heading layout (confirmed defect, reproduced 2×, deferred because it needs a visual-diff baseline this environment cannot support); whitespace-padded name fields silently accepted (minor, unconfirmed whether the backend trims — the edge-probe itself flagged it unconfirmed). Both journeys: performance baseline (out of scope for a functional-correctness brief; not full k6 load testing). All five are recorded, authorized deferrals from the breadth-sweep's `authorisation.scopeReduction`, not silent drops. |
+
+**One-line summary:** no gated areas, no adversarial opt-outs, no blocked
+journeys, no ambiguous ledger findings; one test's coverage is conditional
+on live account state rather than unconditional; five expectations (six gap
+rows) are deliberately deferred with recorded reasons rather than dropped.
+None of this residual risk affects the P0 hard-gate finding above — even
+setting every deferred/conditional item aside as "acceptable risk," both P0
+journeys remain below 100% of authored expectations on their own terms.
