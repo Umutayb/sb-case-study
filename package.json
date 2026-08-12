@@ -11,7 +11,8 @@
     "test:report": "playwright show-report",
     "test:repair": "achilles-self-repair",
     "test:debug": "playwright test --headed --debug",
-    "test:no-defects": "playwright test --grep-invert @known-defect"
+    "test:no-defects": "playwright test --grep-invert @known-defect",
+    "evidence": "playwright test --config=playwright.evidence.config.ts; node scripts/collect-evidence.mjs"
   },
   "author": "",
   "license": "ISC",

@@ -165,6 +165,12 @@ Three confirmed defects, each reproduced at least twice before being written
 down. Two carry failing tests; the third is reported without one, for the
 reason given below.
 
+**Screen recordings and screenshots for each are in
+[`defect-evidence/`](defect-evidence/)** — MP4 of the full reproduction plus the
+failure screenshot, one pair per defect. Regenerate them any time with
+`npm run evidence`, which runs only the `@known-defect` tests with video and
+tracing on and converts the output to MP4.
+
 ### 1. An unrecognised modal route blanks the application
 
 Navigating to `/dashboard/my-overview(modal:<anything-unrecognised>)` makes the
