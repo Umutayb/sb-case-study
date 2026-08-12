@@ -159,10 +159,30 @@ loud failure and a conversation about a test-mode key, not a workaround.
 
 ---
 
-## A defect found while building this
+## Defects found while building this
 
-**Signup does not enforce email uniqueness, and fails silently.** Reproduced
-on the demo environment on 2026-08-12:
+Three confirmed defects, each reproduced at least twice before being written
+down. Two carry failing tests; the third is reported without one, for the
+reason given below.
+
+### 1. An unrecognised modal route blanks the application
+
+Navigating to `/dashboard/my-overview(modal:<anything-unrecognised>)` makes the
+Angular Router raise `NG04002` ("cannot match any routes"). The URL collapses
+to `/` and the page renders **completely empty** — `document.body.innerText`
+is zero characters. No message, no navigation, no way back. Reproduced three
+times, authenticated and not; auth state is irrelevant.
+
+This is not just a malformed-URL curiosity. The signup flow itself lands on
+`(modal:onboarding-welcome)` and `(modal:highlights)`, so these auxiliary
+routes reach real browser history and real bookmarks. Rename or retire a modal
+and every stored link to it becomes a blank white screen.
+
+Covered by `tests/e2e/router-malformed-modal.spec.ts` (fails).
+
+### 2. Signup accepts a duplicate email, then rejects the password it accepted
+
+Reproduced on the demo environment on 2026-08-12:
 
 1. Register with an email address that already has an account. The form
    accepts it — no "already in use" error, on the form or anywhere later.
@@ -202,13 +222,44 @@ To run without them:
 npm run test:no-defects        # or: npx playwright test --grep-invert @known-defect
 ```
 
-Expected results today: **13 passed, 2 failed** on a full run; **13 passed** with
+Expected results today: **13 passed, 3 failed** on a full run; **13 passed** with
 the known-defect tests excluded.
 
 One implementation note, since the first version of this test got it wrong:
 it asserts that a conflict message *is present*, not that the questionnaire
 *is absent*. An absence check passes vacuously in the moment before the
 questionnaire renders — it would have gone green while the defect was live.
+
+### 3. First and last name have no length limit
+
+A 300-character first name is accepted and rendered verbatim into the
+questionnaire's "Welcome, &lt;name&gt;." heading, which overflows the viewport with
+no wrapping or truncation. Reproduced twice.
+
+Reported without a test on purpose. Asserting "the layout is broken" needs a
+visual-regression baseline, and this environment has none — the trial banner
+counts down daily and the first-run modal varies between runs, so a snapshot
+would be noise. The fix is a `maxlength` on the input and truncation in the
+heading; a meaningful test comes after that, not before.
+
+### Also observed, not defects
+
+Worth knowing, and recorded in `tests/e2e/docs/app-context.md`:
+
+- The signup questionnaire keeps **no durable state** — navigating away and
+  back, or using browser Back/Forward, discards every answer and returns to
+  registration step 1. The in-app `Back` button does preserve answers. Defensible
+  as designed, but a long questionnaire with no resume is a conversion risk.
+- **Onboarding completion is unenforced** — the dashboard is reachable without
+  ever visiting `/onboarding`.
+- **Concurrent sessions are allowed**, and logging out of one leaves the other
+  authenticated.
+- **A stale session is handled well**: deleting the cookie mid-session and
+  triggering an API call redirects cleanly to `/login` rather than hanging or
+  blanking.
+- Empty-submit validation on signup is **inconsistent with login's** — all six
+  fields are marked invalid, but only the phone field explains why, whereas
+  login says "Email is required" / "Password is required" outright.
 
 ## Selector strategy
 
