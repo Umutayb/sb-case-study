@@ -71,9 +71,10 @@ The suite runs identically either way. CI uses `--ignore-scripts`.
 
 ## What is covered
 
-13 tests across three Playwright projects (`setup`, `chromium`, `mobile`).
-Each one is here because it covers a distinct way the flow can break, not to
-inflate a count.
+22 passing tests across three Playwright projects (`setup`, `chromium`,
+`mobile`), plus 3 that fail on purpose against confirmed defects. Each one is
+here because it covers a distinct way the flow can break, not to inflate a
+count.
 
 ### Signup and onboarding
 
@@ -82,6 +83,11 @@ inflate a count.
 | A new trial account reaches the dashboard | The flow the brief names. Registration → 8-step questionnaire → setup wizard → dashboard, including asserting the first-run dialog is genuinely dismissed. |
 | The registration form hands off to the questionnaire | The handoff is invisible in the URL — `/signup` stays put — so it needs its own assertion on the content that replaces the form. |
 | The registration form is usable on a mobile viewport `@mobile` | Narrow-viewport layout is where signup forms break first. Deliberately not a full mobile questionnaire walk — see below. |
+| Empty submit blocks and marks every required field invalid | The submit handler must fail closed. All six fields get `aria-invalid`, which is the reliable signal — inline text is inconsistent (see below). |
+| An invalid email format is rejected | Validation fires on submit, not on blur. |
+| A non-numeric phone number is rejected | The one field that does surface inline error text. |
+| A weak password leaves the requirement checklist unmet | Password has no error message — it renders a live five-item checklist instead, so the assertion counts unmet items. |
+| An unticked terms checkbox blocks submission | A required legal consent that must not be bypassable. |
 
 ### Login
 
@@ -94,6 +100,10 @@ inflate a count.
 | An unknown email is rejected | The other half of failing closed. |
 | Rejection does not reveal whether the account exists | Asserts the wrong-password and unknown-account messages are *identical*, so the form cannot be used as an account-enumeration oracle. |
 | A logged-out visitor cannot reach the dashboard directly | Route guarding, approached from outside. |
+| "Back to login" on the MFA prompt terminates the session | It looks like a passive back-link and is actually a logout. Pinned precisely because it is surprising. |
+| The login form is usable on a mobile viewport `@mobile` | Same reasoning as signup's mobile check. |
+| Logging out of one session leaves a concurrent one authenticated | Documents the app's actual multi-session behaviour rather than assuming single-session semantics. |
+| An invalidated session redirects rather than hanging | The failure mode that matters: a dead session should send you to login, not blank or freeze. |
 
 ### Session
 
@@ -228,7 +238,7 @@ To run without them:
 npm run test:no-defects        # or: npx playwright test --grep-invert @known-defect
 ```
 
-Expected results today: **13 passed, 3 failed** on a full run; **13 passed** with
+Expected results today: **22 passed, 3 failed** on a full run; **22 passed** with
 the known-defect tests excluded.
 
 One implementation note, since the first version of this test got it wrong:
@@ -263,9 +273,16 @@ Worth knowing, and recorded in `tests/e2e/docs/app-context.md`:
 - **A stale session is handled well**: deleting the cookie mid-session and
   triggering an API call redirects cleanly to `/login` rather than hanging or
   blanking.
-- Empty-submit validation on signup is **inconsistent with login's** — all six
-  fields are marked invalid, but only the phone field explains why, whereas
-  login says "Email is required" / "Password is required" outright.
+- **Signup's validation messaging is inconsistent**, both internally and against
+  login's. On an empty submit all six required fields get `aria-invalid="true"`,
+  but what the user is *told* varies per field: phone gets inline text, email
+  says nothing until submission is attempted (not on blur, and nothing at all on
+  an empty submit), first name / last name / terms get invalid styling with no
+  message, and password has no text message at all — it renders a live
+  five-item requirement checklist instead. Login, by contrast, says "Email is
+  required" / "Password is required" outright. The attribute is the only
+  reliable signal across all six, which is why the specs assert on it rather
+  than on message text.
 
 ## Selector strategy
 
