@@ -35,6 +35,38 @@ async function clickNextWhenEnabled(steps: Steps): Promise<void> {
   await steps.click('nextButton', QUIZ);
 }
 
+/** Polls the step's `Next` button, resolving false if it stays disabled. */
+async function nextBecomesEnabled(steps: Steps, timeoutMs = 5000): Promise<boolean> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if ((await steps.getAttribute('nextButton', QUIZ, 'disabled')) === null) return true;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  return false;
+}
+
+/**
+ * Selects an answer, then advances.
+ *
+ * The label click is occasionally lost: the questionnaire re-renders each step
+ * as it validates, and a click landing during that swap never reaches the
+ * input, leaving `Next` disabled until the test times out. Observed as an
+ * intermittent 30s failure on the full signup run.
+ *
+ * Rather than retrying the whole test, the selection is re-asserted once if it
+ * did not take. If the answer registered the first time — the normal case —
+ * this costs one attribute read.
+ */
+async function selectAnswerAndAdvance(steps: Steps, option: string): Promise<void> {
+  await steps.click(option, QUIZ);
+
+  if (!(await nextBecomesEnabled(steps))) {
+    await steps.click(option, QUIZ);
+  }
+
+  await clickNextWhenEnabled(steps);
+}
+
 /**
  * Walks the profiling questionnaire that follows registration.
  *
@@ -68,8 +100,7 @@ export async function completeQuestionnaire(steps: Steps, user: TestUser): Promi
     'criticalEventOption',
     'urgencyOption',
   ]) {
-    await steps.click(option, QUIZ);
-    await clickNextWhenEnabled(steps);
+    await selectAnswerAndAdvance(steps, option);
   }
 
   await steps.waitForUrl(UrlPattern.ONBOARDING, undefined, { timeout: 30000 });

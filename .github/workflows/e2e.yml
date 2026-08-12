@@ -28,12 +28,24 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      # The suite proper. This gates the build: a failure here is a regression.
       - name: Run E2E suite
-        run: npx playwright test
+        run: npm run test:no-defects
         env:
           # Unset here on purpose: CI exercises the cold-clone path, where the
           # suite mints its own account through the real signup flow rather
           # than relying on a configured one.
+          BASE_URL: https://app.sb036c506.demo.shiftbase.co
+
+      # The known-defect tests are expected to fail while the bug is live, so
+      # they report rather than block — a permanently red pipeline stops being
+      # read. When signup starts enforcing email uniqueness this step turns
+      # green and can be folded into the step above.
+      - name: Known defects (reporting only)
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: npx playwright test --grep @known-defect
+        env:
           BASE_URL: https://app.sb036c506.demo.shiftbase.co
 
       - name: Upload report

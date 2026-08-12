@@ -177,12 +177,38 @@ new password, complete all eight questionnaire steps and the setup wizard —
 and then be unable to log in with the password they just set, with nothing
 having told them anything went wrong.
 
-`tests/e2e/signup-duplicate-email.spec.ts` describes the behaviour the product
-*should* have. Both tests are marked `test.fixme`, so they document the defect
-without failing the suite; deleting the `fixme` markers turns them into the
-regression guard once it is fixed. They were not rewritten to assert the buggy
-behaviour — a test suite that adjusts itself to match a bug stops being able
-to detect it.
+### These two tests fail on purpose
+
+`tests/e2e/signup-duplicate-email.spec.ts` **fails**, and that is the intended
+state. The two tests describe how the product should behave; it does not
+behave that way, so the suite says so.
+
+```
+✘ registering an already-used email surfaces a conflict message
+    expect(locator).toContainText(/already (registered|in use|exists)/i) failed
+
+✘ a password set during a duplicate registration works at login
+    TimeoutError: page.waitForURL: Timeout 20000ms exceeded
+```
+
+They were not weakened into passing. Rewriting them to assert the buggy
+behaviour, or marking them skipped, would make the suite agree with the bug —
+at which point it can no longer detect it, and the green run would be a lie.
+When the defect is fixed these two become the regression guard with no edit.
+
+To run without them:
+
+```bash
+npm run test:no-defects        # or: npx playwright test --grep-invert @known-defect
+```
+
+Expected results today: **13 passed, 2 failed** on a full run; **13 passed** with
+the known-defect tests excluded.
+
+One implementation note, since the first version of this test got it wrong:
+it asserts that a conflict message *is present*, not that the questionnaire
+*is absent*. An absence check passes vacuously in the moment before the
+questionnaire renders — it would have gone green while the defect was live.
 
 ## Selector strategy
 

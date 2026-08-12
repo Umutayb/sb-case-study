@@ -10,7 +10,8 @@
     "test:headed": "playwright test --headed",
     "test:report": "playwright show-report",
     "test:repair": "achilles-self-repair",
-    "test:debug": "playwright test --headed --debug"
+    "test:debug": "playwright test --headed --debug",
+    "test:no-defects": "playwright test --grep-invert @known-defect"
   },
   "author": "",
   "license": "ISC",
