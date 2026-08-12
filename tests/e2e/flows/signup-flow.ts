@@ -7,9 +7,18 @@ const ONBOARDING = 'OnboardingPage';
 
 /**
  * Fills and submits the registration form. Leaves the browser on the first
- * questionnaire step.
+ * questionnaire step on success, or on the registration step (with inline
+ * validation visible) when the form is invalid.
+ *
+ * `acceptTerms` defaults to `true` so every existing call site keeps
+ * submitting a fully valid form; validation specs pass `false` to exercise
+ * the unticked-terms rejection without duplicating the fill sequence.
  */
-export async function submitRegistrationForm(steps: Steps, user: TestUser): Promise<void> {
+export async function submitRegistrationForm(
+  steps: Steps,
+  user: TestUser,
+  options: { acceptTerms?: boolean } = {},
+): Promise<void> {
   await steps.navigateTo(Routes.SIGNUP, { waitUntil: 'domcontentloaded' });
 
   await steps.fill('firstName', SIGNUP, user.firstName);
@@ -17,7 +26,9 @@ export async function submitRegistrationForm(steps: Steps, user: TestUser): Prom
   await steps.fill('email', SIGNUP, user.email);
   await steps.fill('mobileNumber', SIGNUP, user.mobileNumber);
   await steps.fill('password', SIGNUP, user.password);
-  await steps.check('termsCheckbox', SIGNUP);
+  if (options.acceptTerms ?? true) {
+    await steps.check('termsCheckbox', SIGNUP);
+  }
 
   await steps.click('getStartedButton', SIGNUP);
 }

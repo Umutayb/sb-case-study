@@ -71,6 +71,24 @@
             "role": "link",
             "name": "Log in"
           }
+        },
+        {
+          "elementName": "emailInvalidError",
+          "selector": {
+            "text": "Invalid email"
+          }
+        },
+        {
+          "elementName": "phoneInvalidError",
+          "selector": {
+            "text": "Telephone number is invalid"
+          }
+        },
+        {
+          "elementName": "passwordUnmetRequirement",
+          "selector": {
+            "css": "sb-password-input-requirements sb-icon[aria-label='exclamation-circle']"
+          }
         }
       ]
     },

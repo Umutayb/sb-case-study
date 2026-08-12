@@ -5,10 +5,11 @@ Companion to `tests/e2e/docs/journey-map.md`. Maps every authored journey
 its authored `Test expectations` / supporting assertions, or `<missing>`
 where no spec exists yet. Two journeys, both P0: j-signup-onboard, j-login.
 
-**Suite snapshot:** 13 passing tests across `signup.spec.ts`, `login.spec.ts`,
-`login-negative.spec.ts`, `session.spec.ts`; 3 tests failing on purpose
-(`@known-defect`) in `signup-duplicate-email.spec.ts` and
-`router-malformed-modal.spec.ts`, tracking confirmed product defects.
+**Suite snapshot:** 18 passing tests across `signup.spec.ts`,
+`signup-validation.spec.ts`, `login.spec.ts`, `login-negative.spec.ts`,
+`session.spec.ts`; 3 tests failing on purpose (`@known-defect`) in
+`signup-duplicate-email.spec.ts` and `router-malformed-modal.spec.ts`,
+tracking confirmed product defects.
 
 ## j-signup-onboard
 
@@ -19,13 +20,13 @@ where no spec exists yet. Two journeys, both P0: j-signup-onboard, j-login.
 | Mobile: yes (registration form) | `signup.spec.ts` › "the registration form is usable on a mobile viewport `@mobile`" | Covered |
 | Error state — duplicate email accepted silently (defect) | `signup-duplicate-email.spec.ts` › both tests (`@known-defect`, fail on purpose) | Covered (defect-tracking) |
 | Error state — malformed dashboard modal aux-route blanks the page (defect) | `router-malformed-modal.spec.ts` › "an unknown modal auxiliary route does not blank the page" (`@known-defect`, fails on purpose) | Covered (defect-tracking) |
-| Error state — empty submit / invalid email / invalid phone / weak password / unticked terms | — | `<missing>` |
+| Error state — empty submit / invalid email / invalid phone / weak password / unticked terms | `signup-validation.spec.ts` › all 5 tests | Covered |
 | Edge case — 300-char first name, no length cap, breaks questionnaire heading layout (defect) | — | `<missing>` |
 | Edge case — wizard progress lost on browser back/forward or direct URL revisit, no warning/resume (defect) | — | `<missing>` |
 | Edge case — whitespace-padded name fields silently accepted (minor, unconfirmed) | — | `<missing>` |
 | Performance baseline | — | `<missing>` |
 
-**Journey coverage: 5/10 authored expectations covered.**
+**Journey coverage: 6/10 authored expectations covered.**
 
 ## j-login
 
@@ -85,11 +86,10 @@ future coverage-expansion backlog for this project.
 
 | Journey | Priority | Expectations authored | Covered | Missing |
 |---|---|---|---|---|
-| j-signup-onboard | P0 | 10 | 5 | 5 |
+| j-signup-onboard | P0 | 10 | 6 | 4 |
 | j-login | P0 | 15 | 8 | 7 |
 
-13/25 authored expectations covered across the two in-scope P0 journeys.
-The remaining 12 gaps are itemized in `journey-map.md`'s `## Coverage Plan`
-(~5–6 targeted dispatches, ~1.5–2h estimated) — not a full re-composition,
-since both journeys' core happy paths and most error states are already
-built and passing.
+14/25 authored expectations covered across the two in-scope P0 journeys.
+The remaining 11 gaps are itemized in `journey-map.md`'s `## Coverage Plan`
+— not a full re-composition, since both journeys' core happy paths and most
+error states are already built and passing.

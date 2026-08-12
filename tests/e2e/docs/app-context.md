@@ -63,6 +63,30 @@ both directions. Radio inputs do not respond to a click on the input itself —
 they are `class="peer sr-only"`, and the clickable target is the adjacent
 label element.
 
+**Client-side validation (confirmed live, 2026-08-12):** all six required
+registration fields (`First name`, `Last name`, email, phone, password,
+terms checkbox) get a real `aria-invalid="true"` attribute when invalid —
+reliably assertable via `steps.verifyAttribute(el, 'SignupPage',
+'aria-invalid', 'true')`. Inline error *text* is much sparser than the
+attribute-level marking:
+- Phone gets "Telephone number is invalid" as soon as an invalid value is
+  present (empty or non-numeric alike).
+- Email only shows "Invalid email" once submission is attempted (not on
+  blur), and does not show anything on a merely-empty submit — so an empty
+  submit produces phone's inline text but not email's.
+- First name, last name, and the terms checkbox get invalid styling with no
+  message at all.
+- Password never gets a plain-text message; instead a live 5-item
+  requirement checklist (`sb-password-input-requirements`) renders one
+  `sb-icon` per requirement — `aria-label="exclamation-circle"` for unmet,
+  `aria-label="check"` for met. Selector added to the repository as
+  `passwordUnmetRequirement` (`sb-password-input-requirements
+  sb-icon[aria-label='exclamation-circle']`) for counting unmet items.
+
+All five scenarios block submission client-side — the URL and the
+registration heading stay put, the questionnaire never renders. Covered by
+`tests/e2e/signup-validation.spec.ts`.
+
 **Known defect — email uniqueness is not enforced.** Registering with an email
 that already has an account is accepted with no conflict error, proceeds
 through the entire questionnaire and wizard, and reaches the dashboard. The
