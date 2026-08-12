@@ -1,0 +1,26 @@
+{
+  "name": "sb-case-study",
+  "version": "1.0.0",
+  "description": "E2E test suite for Shiftbase signup/onboarding and login flows",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report",
+    "test:repair": "achilles-self-repair"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@civitas-cerebrum/element-interactions": "^0.3.9",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@civitas-cerebrum/achilles": "^0.1.7",
+    "@playwright/test": "^1.62.1"
+  },
+  "private": true
+}
