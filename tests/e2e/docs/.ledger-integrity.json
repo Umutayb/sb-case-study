@@ -1,0 +1,28 @@
+{
+  "records": [
+    {
+      "sha256": "915c5f063c252011e24680aeb785a061327cecda1c1481a6246a4e7d4ae8edbd",
+      "ts": 1786544167
+    },
+    {
+      "sha256": "3a151f2ed178f870be6b784e5116d75a3d0bc7fa6c0686935ce20f1965485acf",
+      "ts": 1786544610
+    },
+    {
+      "sha256": "be4099c8204570385f964991950f6f84999f9aeee3193f2c9b0fe8750287e625",
+      "ts": 1786544618
+    },
+    {
+      "sha256": "f86bbca3c7c3b9588f4c1018f11ddda9026926d782a22ee7420b8325c2ac78ed",
+      "ts": 1786544623
+    }
+  ],
+  "keyedRecords": {
+    ".phase4-cycle-state.json": [
+      {
+        "sha256": "6da52c9f54f11744068a06c9fac21f3bf39006a7a1966fe2f7f8915eb88f01f3",
+        "ts": 1786544231
+      }
+    ]
+  }
+}

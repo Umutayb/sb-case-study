@@ -1,5 +1,5 @@
 import { test } from './fixtures/base';
-import { buildUser, UrlPattern } from './fixtures/test-data';
+import { buildUser, Routes, UrlPattern } from './fixtures/test-data';
 import {
   submitRegistrationForm,
   completeQuestionnaire,
@@ -27,6 +27,27 @@ test.describe('Signup and onboarding', () => {
 
     await steps.verifyPresence('mySchedulePanel', 'DashboardPage');
     await steps.verifyPresence('scheduleNavLink', 'DashboardPage');
+  });
+
+  /**
+   * Runs only in the `mobile` project. The registration form is the surface
+   * most likely to break under a narrow viewport, and it is cheap to check —
+   * walking the entire eight-step questionnaire on a second device profile
+   * would double the suite's runtime to re-prove logic the desktop run
+   * already covers.
+   */
+  test('the registration form is usable on a mobile viewport @mobile', async ({ steps }) => {
+    const user = buildUser();
+
+    await steps.navigateTo(Routes.SIGNUP, { waitUntil: 'domcontentloaded' });
+
+    await steps.verifyPresence('heading', 'SignupPage');
+    await steps.fill('firstName', 'SignupPage', user.firstName);
+    await steps.fill('email', 'SignupPage', user.email);
+    await steps.verifyInputValue('email', 'SignupPage', user.email);
+
+    await steps.verifyState('getStartedButton', 'SignupPage', 'visible');
+    await steps.verifyPresence('loginLink', 'SignupPage');
   });
 
   test('the registration form hands off to the questionnaire', async ({ steps }) => {

@@ -3,93 +3,368 @@
     {
       "name": "SignupPage",
       "elements": [
-        { "elementName": "heading", "selector": { "role": "heading", "name": { "regex": "Let's get started for free", "flags": "i" } } },
-        { "elementName": "firstName", "selector": { "role": "textbox", "name": "First name" } },
-        { "elementName": "lastName", "selector": { "role": "textbox", "name": "Last name" } },
-        { "elementName": "email", "selector": { "role": "textbox", "name": "Your business email" } },
-        { "elementName": "mobileNumber", "selector": { "role": "textbox", "name": "Your mobile number" } },
-        { "elementName": "countryCodeButton", "selector": { "css": "button[class*='country'], button:has-text('+31')" } },
-        { "elementName": "password", "selector": { "role": "textbox", "name": "Password" } },
-        { "elementName": "showPasswordToggle", "selector": { "role": "button", "name": "Show password" } },
-        { "elementName": "termsCheckbox", "selector": { "role": "checkbox", "name": { "regex": "I accept the terms", "flags": "i" } } },
-        { "elementName": "marketingOptIn", "selector": { "role": "checkbox", "name": { "regex": "email me Shiftbase updates", "flags": "i" } } },
-        { "elementName": "getStartedButton", "selector": { "role": "button", "name": "Get started" } },
-        { "elementName": "loginLink", "selector": { "role": "link", "name": "Log in" } }
+        {
+          "elementName": "heading",
+          "selector": {
+            "role": "heading",
+            "name": {
+              "regex": "Let's get started for free",
+              "flags": "i"
+            }
+          }
+        },
+        {
+          "elementName": "firstName",
+          "selector": {
+            "role": "textbox",
+            "name": "First name"
+          }
+        },
+        {
+          "elementName": "lastName",
+          "selector": {
+            "role": "textbox",
+            "name": "Last name"
+          }
+        },
+        {
+          "elementName": "email",
+          "selector": {
+            "role": "textbox",
+            "name": "Your business email"
+          }
+        },
+        {
+          "elementName": "mobileNumber",
+          "selector": {
+            "role": "textbox",
+            "name": "Your mobile number"
+          }
+        },
+        {
+          "elementName": "password",
+          "selector": {
+            "role": "textbox",
+            "name": "Password"
+          }
+        },
+        {
+          "elementName": "termsCheckbox",
+          "selector": {
+            "role": "checkbox",
+            "name": {
+              "regex": "I accept the terms",
+              "flags": "i"
+            }
+          }
+        },
+        {
+          "elementName": "getStartedButton",
+          "selector": {
+            "role": "button",
+            "name": "Get started"
+          }
+        },
+        {
+          "elementName": "loginLink",
+          "selector": {
+            "role": "link",
+            "name": "Log in"
+          }
+        }
       ]
     },
     {
       "name": "SignupQuestionnairePage",
       "elements": [
-        { "elementName": "stepHeading", "selector": { "css": "h1" } },
-        { "elementName": "businessName", "selector": { "css": "input[formcontrolname='company']" } },
-        { "elementName": "numberOfEmployees", "selector": { "role": "spinbutton", "name": "Number of employees" } },
-        { "elementName": "countryButton", "selector": { "role": "button", "name": "Country" } },
-        { "elementName": "nextButton", "selector": { "role": "button", "name": "Next" } },
-        { "elementName": "backButton", "selector": { "role": "button", "name": "Back" } },
-        { "elementName": "progressBar", "selector": { "role": "progressbar" } },
-
-        { "elementName": "businessTypeOption", "selector": { "css": "[formcontrolname='industry_group'] input[value='Services'] + label" } },
-        { "elementName": "industryOption", "selector": { "css": "[formcontrolname='industry'] input[value='Consulting'] + label" } },
-        { "elementName": "buyerRoleOption", "selector": { "css": "[formcontrolname='buyer_role'] input[value='Operation manager'] + label" } },
-        { "elementName": "needSchedulingOption", "selector": { "css": "[formcontrolname='buyer_intent'] input[value='intent_schedule'] + label" } },
-        { "elementName": "needTimeTrackingOption", "selector": { "css": "[formcontrolname='buyer_intent'] input[value='intent_timetracking'] + label" } },
-        { "elementName": "situationOption", "selector": { "css": "[formcontrolname='situation'] input[value='situation_spreadsheets'] + label" } },
-        { "elementName": "painOption", "selector": { "css": "[formcontrolname='pain'] input[value='pain_scheduling_takes_too_much_time'] + label" } },
-        { "elementName": "impactOption", "selector": { "css": "[formcontrolname='impact'] input[value='impact_time_wasted_scheduling'] + label" } },
-        { "elementName": "criticalEventOption", "selector": { "css": "[formcontrolname='critical_event'] input[value='critical_event_rapid_growth'] + label" } },
-        { "elementName": "urgencyOption", "selector": { "css": "[formcontrolname='intent_urgency'] input[value='exploring'] + label" } }
+        {
+          "elementName": "businessName",
+          "selector": {
+            "css": "input[formcontrolname='company']"
+          }
+        },
+        {
+          "elementName": "numberOfEmployees",
+          "selector": {
+            "role": "spinbutton",
+            "name": "Number of employees"
+          }
+        },
+        {
+          "elementName": "nextButton",
+          "selector": {
+            "role": "button",
+            "name": "Next"
+          }
+        },
+        {
+          "elementName": "progressBar",
+          "selector": {
+            "role": "progressbar"
+          }
+        },
+        {
+          "elementName": "businessTypeOption",
+          "selector": {
+            "css": "[formcontrolname='industry_group'] input[value='Services'] + label"
+          }
+        },
+        {
+          "elementName": "industryOption",
+          "selector": {
+            "css": "[formcontrolname='industry'] input[value='Consulting'] + label"
+          }
+        },
+        {
+          "elementName": "buyerRoleOption",
+          "selector": {
+            "css": "[formcontrolname='buyer_role'] input[value='Operation manager'] + label"
+          }
+        },
+        {
+          "elementName": "needSchedulingOption",
+          "selector": {
+            "css": "[formcontrolname='buyer_intent'] input[value='intent_schedule'] + label"
+          }
+        },
+        {
+          "elementName": "needTimeTrackingOption",
+          "selector": {
+            "css": "[formcontrolname='buyer_intent'] input[value='intent_timetracking'] + label"
+          }
+        },
+        {
+          "elementName": "situationOption",
+          "selector": {
+            "css": "[formcontrolname='situation'] input[value='situation_spreadsheets'] + label"
+          }
+        },
+        {
+          "elementName": "painOption",
+          "selector": {
+            "css": "[formcontrolname='pain'] input[value='pain_scheduling_takes_too_much_time'] + label"
+          }
+        },
+        {
+          "elementName": "impactOption",
+          "selector": {
+            "css": "[formcontrolname='impact'] input[value='impact_time_wasted_scheduling'] + label"
+          }
+        },
+        {
+          "elementName": "criticalEventOption",
+          "selector": {
+            "css": "[formcontrolname='critical_event'] input[value='critical_event_rapid_growth'] + label"
+          }
+        },
+        {
+          "elementName": "urgencyOption",
+          "selector": {
+            "css": "[formcontrolname='intent_urgency'] input[value='exploring'] + label"
+          }
+        }
       ]
     },
     {
       "name": "OnboardingPage",
       "elements": [
-        { "elementName": "stepHeading", "selector": { "css": "h1" } },
-        { "elementName": "teamNameInput", "selector": { "css": "input[type='text']" } },
-        { "elementName": "addTeamButton", "selector": { "role": "button", "name": "Add team" } },
-        { "elementName": "nextButton", "selector": { "role": "button", "name": "Next" } },
-        { "elementName": "skipButton", "selector": { "role": "button", "name": "Skip" } },
-        { "elementName": "allSetHeading", "selector": { "role": "heading", "name": { "regex": "You're all set", "flags": "i" } } },
-        { "elementName": "seeInActionButton", "selector": { "role": "button", "name": { "regex": "See Shiftbase in action", "flags": "i" } } }
+        {
+          "elementName": "nextButton",
+          "selector": {
+            "role": "button",
+            "name": "Next"
+          }
+        },
+        {
+          "elementName": "skipButton",
+          "selector": {
+            "role": "button",
+            "name": "Skip"
+          }
+        },
+        {
+          "elementName": "allSetHeading",
+          "selector": {
+            "role": "heading",
+            "name": {
+              "regex": "You're all set",
+              "flags": "i"
+            }
+          }
+        },
+        {
+          "elementName": "seeInActionButton",
+          "selector": {
+            "role": "button",
+            "name": {
+              "regex": "See Shiftbase in action",
+              "flags": "i"
+            }
+          }
+        }
       ]
     },
     {
       "name": "LoginPage",
       "elements": [
-        { "elementName": "heading", "selector": { "role": "heading", "name": "Welcome back" } },
-        { "elementName": "email", "selector": { "role": "textbox", "name": "Email address" } },
-        { "elementName": "password", "selector": { "role": "textbox", "name": "Password" } },
-        { "elementName": "showPasswordToggle", "selector": { "role": "button", "name": "Show password" } },
-        { "elementName": "keepMeLoggedIn", "selector": { "role": "checkbox", "name": "Keep me logged in" } },
-        { "elementName": "loginButton", "selector": { "role": "button", "name": "Log in" } },
-        { "elementName": "forgotPasswordLink", "selector": { "role": "link", "name": "Forgot password?" } },
-        { "elementName": "errorAlert", "selector": { "role": "alert" } },
-        { "elementName": "emailRequiredError", "selector": { "text": "Email is required" } },
-        { "elementName": "passwordRequiredError", "selector": { "text": "Password is required" } }
+        {
+          "elementName": "heading",
+          "selector": {
+            "role": "heading",
+            "name": "Welcome back"
+          }
+        },
+        {
+          "elementName": "email",
+          "selector": {
+            "role": "textbox",
+            "name": "Email address"
+          }
+        },
+        {
+          "elementName": "password",
+          "selector": {
+            "role": "textbox",
+            "name": "Password"
+          }
+        },
+        {
+          "elementName": "loginButton",
+          "selector": {
+            "role": "button",
+            "name": "Log in"
+          }
+        },
+        {
+          "elementName": "errorAlert",
+          "selector": {
+            "role": "alert"
+          }
+        },
+        {
+          "elementName": "emailRequiredError",
+          "selector": {
+            "text": "Email is required"
+          }
+        },
+        {
+          "elementName": "passwordRequiredError",
+          "selector": {
+            "text": "Password is required"
+          }
+        }
       ]
     },
     {
       "name": "MfaPromotePage",
       "elements": [
-        { "elementName": "heading", "selector": { "role": "heading", "name": "Multifactor authentication" } },
-        { "elementName": "setUpNowButton", "selector": { "role": "button", "name": "Set up now" } },
-        { "elementName": "remindMeLaterButton", "selector": { "role": "button", "name": "Remind me later" } },
-        { "elementName": "dontAskAgainButton", "selector": { "role": "button", "name": { "regex": "Don.t ask again", "flags": "i" } } },
-        { "elementName": "backToLoginButton", "selector": { "role": "button", "name": "Back to login" } }
+        {
+          "elementName": "heading",
+          "selector": {
+            "role": "heading",
+            "name": "Multifactor authentication"
+          }
+        },
+        {
+          "elementName": "setUpNowButton",
+          "selector": {
+            "role": "button",
+            "name": "Set up now"
+          }
+        },
+        {
+          "elementName": "remindMeLaterButton",
+          "selector": {
+            "role": "button",
+            "name": "Remind me later"
+          }
+        },
+        {
+          "elementName": "dontAskAgainButton",
+          "selector": {
+            "role": "button",
+            "name": {
+              "regex": "Don.t ask again",
+              "flags": "i"
+            }
+          }
+        }
       ]
     },
     {
       "name": "DashboardPage",
       "elements": [
-        { "elementName": "homeNavLink", "selector": { "role": "link", "name": "Home" } },
-        { "elementName": "scheduleNavLink", "selector": { "role": "link", "name": "Schedule" } },
-        { "elementName": "timesheetNavLink", "selector": { "role": "link", "name": "Timesheet" } },
-        { "elementName": "employeesNavLink", "selector": { "role": "link", "name": "Employees" } },
-        { "elementName": "reportsNavLink", "selector": { "role": "link", "name": "Reports" } },
-        { "elementName": "mySchedulePanel", "selector": { "role": "heading", "name": "My schedule" } },
-        { "elementName": "myTimesheetsPanel", "selector": { "role": "heading", "name": "My timesheets" } },
-        { "elementName": "trialBanner", "selector": { "role": "heading", "name": { "regex": "Your trial ends in", "flags": "i" } } },
-        { "elementName": "firstRunDialog", "selector": { "role": "dialog" } },
-        { "elementName": "firstRunDialogClose", "selector": { "css": "[role='dialog'] button[aria-label='Close'], [role='dialog'] button:has-text('Close')" } }
+        {
+          "elementName": "homeNavLink",
+          "selector": {
+            "role": "link",
+            "name": "Home"
+          }
+        },
+        {
+          "elementName": "scheduleNavLink",
+          "selector": {
+            "role": "link",
+            "name": "Schedule"
+          }
+        },
+        {
+          "elementName": "timesheetNavLink",
+          "selector": {
+            "role": "link",
+            "name": "Timesheet"
+          }
+        },
+        {
+          "elementName": "employeesNavLink",
+          "selector": {
+            "role": "link",
+            "name": "Employees"
+          }
+        },
+        {
+          "elementName": "reportsNavLink",
+          "selector": {
+            "role": "link",
+            "name": "Reports"
+          }
+        },
+        {
+          "elementName": "mySchedulePanel",
+          "selector": {
+            "role": "heading",
+            "name": "My schedule"
+          }
+        },
+        {
+          "elementName": "myTimesheetsPanel",
+          "selector": {
+            "role": "heading",
+            "name": "My timesheets"
+          }
+        },
+        {
+          "elementName": "trialBanner",
+          "selector": {
+            "role": "heading",
+            "name": {
+              "regex": "Your trial ends in",
+              "flags": "i"
+            }
+          }
+        },
+        {
+          "elementName": "firstRunDialog",
+          "selector": {
+            "role": "dialog"
+          }
+        },
+        {
+          "elementName": "firstRunDialogClose",
+          "selector": {
+            "css": "[role='dialog'] button[aria-label='Close'], [role='dialog'] button:has-text('Close')"
+          }
+        }
       ]
     }
   ]

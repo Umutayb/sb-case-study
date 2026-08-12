@@ -73,8 +73,10 @@ export function generatePassword(): string {
 
 export function buildUser(overrides: Partial<TestUser> = {}): TestUser {
   return {
-    firstName: 'Umut',
-    lastName: 'Bora',
+    // Synthetic rather than a real identity: CI mints an account on every
+    // run, and each one persists in a third-party demo database.
+    firstName: 'QA',
+    lastName: 'Tester',
     email: uniqueEmail(),
     mobileNumber: '612345678',
     password: generatePassword(),

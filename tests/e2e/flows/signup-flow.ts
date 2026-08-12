@@ -105,8 +105,16 @@ export async function completeOnboardingWizard(steps: Steps): Promise<void> {
  * the product, so it lives here — but it is optional, because which first-run
  * modal appears varies between runs.
  */
-export async function dismissFirstRunDialog(steps: Steps): Promise<boolean> {
-  return steps.clickIfPresent('firstRunDialogClose', 'DashboardPage');
+export async function dismissFirstRunDialog(steps: Steps): Promise<void> {
+  const dismissed = await steps.clickIfPresent('firstRunDialogClose', 'DashboardPage');
+
+  // Without this, a close button that stops matching a modal variant would
+  // no-op silently: the dialog stays open, and the dashboard assertions still
+  // pass because Playwright's visibility check ignores elements stacked on
+  // top. The dismissal has to prove it worked.
+  if (dismissed) {
+    await steps.verifyAbsence('firstRunDialog', 'DashboardPage');
+  }
 }
 
 /** Registration through to the dashboard, as one call. */
