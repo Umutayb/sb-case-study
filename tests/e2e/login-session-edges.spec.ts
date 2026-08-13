@@ -183,9 +183,12 @@ test.describe('Login — session and MFA-branch edges', () => {
     // as rendered while the cookie disappears out from under it.
     await context.clearCookies();
 
-    // A plain client-side nav (e.g. clicking a sidebar link) does not trip
-    // this — it renders from state the app already holds. An action that
-    // genuinely calls the API is what surfaces the invalid session.
+    // The trigger has to actually hit the API. A purely local interaction —
+    // the sidebar-collapse toggle, say, which only writes to localStorage —
+    // fires no request and so never notices the cookie is gone. Note that
+    // most sidebar *links* are not purely local: navigating to a data-bearing
+    // page fetches fresh data and does trip the redirect. "Add Worked Hours"
+    // is used here because it is unambiguously API-bound.
     await steps.click('addWorkedHoursButton', DASHBOARD);
 
     await steps.waitForUrl(UrlPattern.LOGIN, undefined, { timeout: 20000 });

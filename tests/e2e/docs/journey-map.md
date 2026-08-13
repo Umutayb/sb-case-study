@@ -105,7 +105,7 @@ Total: 27 in-app routes discovered. Gated: 0 (signup is open; no admin/paid-tier
   - Error state — malformed dashboard modal aux-route blanks the page (defect): **covered**, failing on purpose — `router-malformed-modal.spec.ts`.
   - Error state — empty submit / invalid email / invalid phone / weak password / unticked terms: **gap** — driven live during discovery (cycle-2 edge-probe) but no spec currently asserts these client-side validation states.
   - Edge case — 300-char first name with no length cap, breaking the questionnaire heading layout (confirmed defect, reproduced 2×): **gap**.
-  - Edge case — browser back/forward or a direct URL revisit mid-wizard discards all progress (registration fields included) with no warning or resume (confirmed defect, reproduced via two independent methods): **gap**.
+  - Edge case — browser back/forward or a direct URL revisit mid-wizard discards all progress (registration fields included) with no warning or resume. Reproduced via two independent methods. **Reclassified from "confirmed defect" to pinned behaviour**: not persisting half-entered credentials across a navigation out of the SPA is defensible as designed, and the in-app `Back` button does preserve answers. Covered by `signup-persistence.spec.ts`, which pins the current behaviour so that adding resume later is what breaks the test. The residual concern is a conversion risk on an eight-step questionnaire, recorded in the README as a product observation rather than a bug.
   - Edge case — whitespace-padded name fields silently accepted, no trimming/validation (minor, unconfirmed whether the backend trims): **gap**, low priority.
   - Mobile: yes — **covered** — `signup.spec.ts` › "the registration form is usable on a mobile viewport `@mobile`" (registration form only, by design; the questionnaire reuses the same shell and isn't re-walked on mobile).
   - Performance baseline: **gap** — not yet established.
@@ -212,8 +212,8 @@ Remaining gaps, by journey (see each journey's `Test expectations` for detail):
 | # | Journey | Gap | Suggested pass shape |
 |---|---|---|---|
 | 1 | j-signup-onboard | Client-side validation error states (empty/invalid-email/invalid-phone/weak-password/unticked-terms) — no dedicated spec | Compositional |
-| 2 | j-signup-onboard | Adversarial edge cases: 300-char name overflow, wizard-state loss on back/forward or URL revisit — both confirmed defects, candidates for `@known-defect` regression tests | Adversarial |
-| 3 | j-login | MFA-branch coverage: "Set up now" wrong-code alert, "Don't ask again" persistence, "Back to login" session-termination | Compositional |
+| 2 | j-signup-onboard | Adversarial edge case: 300-char name overflow (confirmed defect; needs a visual-regression baseline this environment cannot support, so reported in the README without a test). Wizard-state loss is no longer listed here — reclassified as pinned behaviour and covered by `signup-persistence.spec.ts`. | Adversarial |
+| 3 | j-login | MFA-branch coverage: "Set up now" wrong-code alert (open), "Back to login" session-termination (closed by `login-session-edges.spec.ts`). "Don't ask again" persistence is documented under Branches but was never an authored `Test expectations` row — it is a candidate for a future pass, not an open gap against this map. | Compositional |
 | 4 | j-login | Adversarial edge cases: concurrent sessions, stale/cookie-invalidated session mid-interaction | Adversarial |
 | 5 | j-login | Mobile-viewport check for the login form, mirroring `signup.spec.ts`'s `@mobile` pattern | Compositional (small) |
 | 6 | Both | Performance baseline (page-load / navigation timing on entry-to-exit) — not full k6 load testing, a lightweight UI-timing assertion per journey | Compositional (small) |
