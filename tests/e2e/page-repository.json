@@ -343,7 +343,7 @@
           "elementName": "homeNavLink",
           "selector": {
             "role": "link",
-            "name": "Home"
+            "name": { "regex": "^(Home|Dashboard)$", "flags": "i" }
           }
         },
         {
@@ -386,16 +386,6 @@
           "selector": {
             "role": "heading",
             "name": "My timesheets"
-          }
-        },
-        {
-          "elementName": "trialBanner",
-          "selector": {
-            "role": "heading",
-            "name": {
-              "regex": "Your trial ends in",
-              "flags": "i"
-            }
           }
         },
         {
