@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shiftbase QA Assessment — E2E Summary</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  :root {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-card: #21262d;
+    --text-bright: #e6edf3;
+    --text-muted: #7d8590;
+    --text-faint: #484f58;
+    --accent-green: #3fb950;
+    --accent-green-dim: rgba(63, 185, 80, 0.15);
+    --accent-blue: #58a6ff;
+    --accent-blue-dim: rgba(88, 166, 255, 0.15);
+    --accent-purple: #bc8cff;
+    --accent-purple-dim: rgba(188, 140, 255, 0.15);
+    --accent-orange: #d29922;
+    --accent-orange-dim: rgba(210, 153, 34, 0.15);
+    --accent-red: #f85149;
+    --border: #30363d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-bright);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Slide Layout ── */
+  .slide {
+    min-height: 100vh;
+    padding: 60px 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    page-break-after: always;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .slide::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+  }
+
+  .slide-number {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    font-size: 13px;
+    color: var(--text-faint);
+    font-weight: 500;
+    letter-spacing: 2px;
+  }
+
+  .brand-mark {
+    position: absolute;
+    top: 30px;
+    left: 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-mark .logo-rings { width: 28px; height: 28px; }
+
+  .brand-mark span {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  /* ── Title Slide ── */
+  .title-slide {
+    text-align: center;
+    background: radial-gradient(ellipse at 50% 30%, rgba(63, 185, 80, 0.08) 0%, transparent 60%), var(--bg-primary);
+  }
+
+  .title-logo { width: 120px; height: 120px; margin: 0 auto 40px; }
+
+  .title-slide h1 {
+    font-size: 52px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--text-bright) 0%, var(--accent-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .title-slide .subtitle { font-size: 20px; color: var(--text-muted); font-weight: 400; margin-bottom: 50px; }
+  .title-slide .tagline { font-size: 28px; font-weight: 600; color: var(--text-bright); max-width: 700px; margin: 0 auto 16px; line-height: 1.3; }
+  .title-slide .description { font-size: 16px; color: var(--text-muted); max-width: 600px; margin: 0 auto 40px; }
+
+  .title-meta {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    font-size: 13px;
+    color: var(--text-faint);
+  }
+
+  .title-meta span { display: flex; align-items: center; gap: 6px; }
+
+  /* ── Typography ── */
+  h2 { font-size: 38px; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.5px; }
+  h3 { font-size: 22px; font-weight: 600; margin-bottom: 20px; }
+  .section-subtitle { font-size: 16px; color: var(--text-muted); margin-bottom: 40px; max-width: 600px; }
+
+  /* ── Cards ── */
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px; }
+  .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--accent-green); }
+
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .card-icon.green { background: var(--accent-green-dim); }
+  .card-icon.blue { background: var(--accent-blue-dim); }
+  .card-icon.purple { background: var(--accent-purple-dim); }
+  .card-icon.orange { background: var(--accent-orange-dim); }
+
+  .card h4 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+  .card p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+  .card .version { display: inline-block; font-size: 11px; font-weight: 600; color: var(--accent-green); background: var(--accent-green-dim); padding: 2px 8px; border-radius: 6px; margin-bottom: 12px; }
+
+  /* ── Stats ── */
+  .stat-row { display: flex; gap: 40px; margin: 30px 0; }
+  .stat { text-align: center; }
+  .stat .number { font-size: 48px; font-weight: 800; color: var(--accent-green); line-height: 1; }
+  .stat .label { font-size: 13px; color: var(--text-muted); margin-top: 6px; font-weight: 500; }
+
+  /* ── Timeline ── */
+  .timeline { position: relative; margin: 30px 0; padding-left: 40px; }
+  .timeline::before { content: ''; position: absolute; left: 12px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, var(--accent-green), var(--accent-blue), var(--accent-purple)); }
+  .timeline-item { position: relative; margin-bottom: 32px; }
+  .timeline-item::before { content: ''; position: absolute; left: -34px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-green); border: 2px solid var(--bg-primary); }
+  .timeline-item:nth-child(2)::before { background: var(--accent-blue); }
+  .timeline-item:nth-child(3)::before { background: var(--accent-purple); }
+  .timeline-item:nth-child(4)::before { background: var(--accent-orange); }
+  .timeline-item:nth-child(5)::before { background: var(--accent-green); }
+  .timeline-item:nth-child(6)::before { background: var(--accent-blue); }
+  .timeline-item h4 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .timeline-item p { font-size: 14px; color: var(--text-muted); }
+
+  .stage-badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 6px; margin-bottom: 8px; }
+  .stage-1 { color: var(--accent-green); background: var(--accent-green-dim); }
+  .stage-2 { color: var(--accent-blue); background: var(--accent-blue-dim); }
+  .stage-3 { color: var(--accent-purple); background: var(--accent-purple-dim); }
+  .stage-4 { color: var(--accent-orange); background: var(--accent-orange-dim); }
+
+  /* ── Architecture Diagram ── */
+  .arch-diagram { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 40px; margin: 20px 0; }
+  .arch-layer { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 16px; }
+  .arch-box { padding: 14px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; min-width: 180px; border: 1px solid; }
+  .arch-box.test { background: var(--accent-green-dim); border-color: rgba(63, 185, 80, 0.3); color: var(--accent-green); }
+  .arch-box.steps { background: var(--accent-blue-dim); border-color: rgba(88, 166, 255, 0.3); color: var(--accent-blue); }
+  .arch-box.factory { background: var(--accent-purple-dim); border-color: rgba(188, 140, 255, 0.3); color: var(--accent-purple); }
+  .arch-box.platform { background: var(--accent-orange-dim); border-color: rgba(210, 153, 34, 0.3); color: var(--accent-orange); }
+  .arch-box.repo { background: rgba(248, 81, 73, 0.1); border-color: rgba(248, 81, 73, 0.3); color: var(--accent-red); }
+  .arch-arrow { text-align: center; color: var(--text-faint); font-size: 18px; margin: 8px 0; }
+
+  /* ── Flow Stages ── */
+  .flow-stages { display: flex; gap: 0; margin: 30px 0; align-items: stretch; }
+  .flow-stage { flex: 1; padding: 24px 20px; background: var(--bg-secondary); border: 1px solid var(--border); position: relative; text-align: center; }
+  .flow-stage:first-child { border-radius: 12px 0 0 12px; }
+  .flow-stage:last-child { border-radius: 0 12px 12px 0; }
+  .flow-stage .stage-num { font-size: 32px; font-weight: 800; color: var(--accent-green); opacity: 0.3; position: absolute; top: 8px; right: 12px; }
+  .flow-stage h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .flow-stage p { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+  .flow-connector { display: flex; align-items: center; color: var(--accent-green); font-size: 20px; padding: 0 2px; }
+
+  /* ── Code Blocks ── */
+  .code-block { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 13px; line-height: 1.6; overflow-x: auto; color: var(--text-bright); }
+  .code-block .comment { color: var(--text-faint); }
+  .code-block .keyword { color: var(--accent-purple); }
+  .code-block .string { color: var(--accent-green); }
+  .code-block .method { color: var(--accent-blue); }
+
+  /* ── Comparison ── */
+  .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 20px 0; }
+  .comparison-panel { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .comparison-panel.before { border-top: 3px solid var(--accent-red); }
+  .comparison-panel.after { border-top: 3px solid var(--accent-green); }
+  .comparison-panel h4 { font-size: 14px; font-weight: 600; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+  .comparison-panel.before h4 { color: var(--accent-red); }
+  .comparison-panel.after h4 { color: var(--accent-green); }
+
+  /* ── Skill Grid ── */
+  .skill-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
+  .skill-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+  .skill-card .skill-icon { font-size: 24px; margin-bottom: 8px; }
+  .skill-card h5 { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+  .skill-card p { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
+
+  /* ── Value List ── */
+  .value-list { list-style: none; margin: 20px 0; }
+  .value-list li { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .value-list li:last-child { border-bottom: none; }
+  .value-list .check { width: 24px; height: 24px; border-radius: 50%; background: var(--accent-green-dim); color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+  .value-list .text h4 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+  .value-list .text p { font-size: 13px; color: var(--text-muted); }
+
+  /* ── NPM Badges ── */
+  .npm-badge { display: inline-flex; align-items: center; gap: 0; font-size: 12px; font-weight: 600; border-radius: 6px; overflow: hidden; margin: 4px 4px 4px 0; }
+  .npm-badge .pkg { background: var(--bg-card); padding: 4px 10px; color: var(--text-muted); }
+  .npm-badge .ver { background: var(--accent-green); padding: 4px 10px; color: #fff; }
+
+  /* ── Table ── */
+  .data-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+  .data-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 12px 16px; border-bottom: 2px solid var(--border); }
+  .data-table td { padding: 14px 16px; font-size: 14px; border-bottom: 1px solid var(--border); }
+  .data-table tr:last-child td { border-bottom: none; }
+
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; }
+  .badge.green { color: var(--accent-green); background: var(--accent-green-dim); }
+  .badge.blue { color: var(--accent-blue); background: var(--accent-blue-dim); }
+  .badge.purple { color: var(--accent-purple); background: var(--accent-purple-dim); }
+
+  /* ── Print ── */
+  @media print {
+    .slide { page-break-after: always; page-break-inside: avoid; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  @page { size: landscape; margin: 0; }
+</style>
+</head>
+<body>
+<!-- ── 01 TITLE ── -->
+<section class="slide title-slide">
+  <div class="slide-number">01 / 08</div>
+  <svg class="title-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="4"/>
+    <circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="4"/>
+  </svg>
+  <h1>Shiftbase QA Assessment</h1>
+  <p class="subtitle">End-to-end automation of the signup &amp; login flows</p>
+  <p class="tagline">Two flows, automated to the dashboard — plus eleven real defects the automation surfaced along the way.</p>
+  <p class="description">Playwright + TypeScript, on the element-interactions Steps API. Runs green from a cold clone with no configuration.</p>
+  <div class="title-meta">
+    <span>Umut Ay Bora</span><span>|</span><span>August 2026</span>
+  </div>
+</section>
+
+<!-- ── 02 OVERVIEW ── -->
+<section class="slide">
+  <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
+  <div class="slide-number">02 / 08</div>
+  <h2>The brief, and what shipped</h2>
+  <p class="section-subtitle">Automate two flows against the Shiftbase demo environment: signup + onboarding up to the dashboard, and login. This is what came back.</p>
+  <div class="card-grid">
+    <div class="card"><div class="card-icon green">🎯</div><h4>Both flows, end to end</h4><p>Signup walks the 8-step questionnaire and setup wizard to the dashboard; login handles the MFA interstitial. Interactions read as intent through the Steps API — no raw selectors in any test.</p></div>
+    <div class="card"><div class="card-icon blue">🔍</div><h4>Eleven defects found</h4><p>Not the point of the brief, but the honest by-product of testing a real product: three found while building, eight from a dedicated adversarial pass. Zero were false positives.</p></div>
+    <div class="card"><div class="card-icon purple">📼</div><h4>Evidence, not claims</h4><p>Every defect carries a reproduction and screen recording / screenshot. Findings that could not be pinned by a portable test are reported with the reason, not faked into one.</p></div>
+    <div class="card"><div class="card-icon orange">▶️</div><h4>Runnable by anyone</h4><p><code>npm ci &amp;&amp; npm test</code> on a clean clone with no <code>.env</code>. Verified by cloning fresh; the suite mints its own account through the real signup flow.</p></div>
+  </div>
+</section>
+
+<!-- ── 03 STATS ── -->
+<section class="slide">
+  <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
+  <div class="slide-number">03 / 08</div>
+  <h2>Coverage at a glance</h2>
+  <p class="section-subtitle">29 tests across three Playwright projects (desktop, mobile, and an account-provisioning setup project).</p>
+  <div class="stat-row" style="justify-content: space-around; margin: 36px 0;">
+    <div class="stat"><div class="number">23</div><div class="label">passing tests</div></div>
+    <div class="stat"><div class="number">6</div><div class="label">failing by design</div></div>
+    <div class="stat"><div class="number">6</div><div class="label">pages mapped</div></div>
+    <div class="stat"><div class="number">56</div><div class="label">elements</div></div>
+    <div class="stat"><div class="number">11</div><div class="label">defects found</div></div>
+  </div>
+  <ul class="value-list">
+    <li><span class="check">✓</span><div class="text"><h4>The 6 failing tests fail on purpose</h4><p>Each is tagged <code>@known-defect</code> and describes the behaviour the product <em>should</em> have — so it fails today and becomes a regression guard the day the bug is fixed. <code>npm run test:no-defects</code> is 23 / 23 green.</p></div></li>
+    <li><span class="check">✓</span><div class="text"><h4>Not weakened to pass</h4><p>Rewriting a test to agree with a bug makes the suite unable to detect it. The failing tests stayed honest instead.</p></div></li>
+  </ul>
+</section>
+
+<!-- ── 04 WHAT'S COVERED ── -->
+<section class="slide">
+  <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
+  <div class="slide-number">04 / 08</div>
+  <h2>What each test protects</h2>
+  <p class="section-subtitle">Chosen, not sprayed — every scenario covers a distinct way a flow can break.</p>
+  <table class="data-table">
+    <thead><tr><th>Flow</th><th>Coverage</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge green">Signup</span></td><td>Registration → questionnaire → wizard → dashboard · form handoff · mobile viewport · empty-submit &amp; per-field validation (email, phone, weak password, terms)</td></tr>
+      <tr><td><span class="badge blue">Login</span></td><td>Valid credentials · the MFA-promote interstitial · wrong password · unknown email · <strong>identical rejection message (no account enumeration)</strong> · protected-route redirect · "Back to login" is a logout · concurrent &amp; stale sessions</td></tr>
+      <tr><td><span class="badge purple">Session</span></td><td>Survives a reload (asserts the dashboard re-renders, not just the URL) · primary navigation present</td></tr>
+    </tbody>
+  </table>
+  <p class="section-subtitle" style="margin-top:24px">Deliberately out of scope, and said so in the README: everything past the dashboard, password reset, cross-browser, visual regression, load.</p>
+</section>
+
+<!-- ── 05 FINDINGS ── -->
+<section class="slide">
+  <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
+  <div class="slide-number">05 / 08</div>
+  <h2>The defects</h2>
+  <p class="section-subtitle">Eleven confirmed, zero refuted. The headline is one UI testing alone would never reach.</p>
+  <div class="card" style="border-color: rgba(248,81,73,0.4); margin-bottom:18px;">
+    <div class="version" style="color:var(--accent-red);background:rgba(248,81,73,0.15)">HIGH · compliance</div>
+    <h4>Terms &amp; Data-Processing-Agreement acceptance is enforced only in the browser</h4>
+    <p><code>POST /api/signup</code> accepts a payload with <code>accept_conditions: false</code> and creates a fully usable account — the required consent checkbox has no server-side counterpart. Reproduced from two fresh sessions, each followed by a successful login. Reported, not automated: a test would replay a compliance-bypass exploit on every CI run against a shared environment.</p>
+  </div>
+  <table class="data-table">
+    <thead><tr><th>Source</th><th>Findings</th><th>Automated</th></tr></thead>
+    <tbody>
+      <tr><td>Found while building</td><td>Router blank-page on a bad modal route · duplicate-email accepted then password rejected · unbounded name length</td><td><span class="badge green">2 of 3 as tests</span></td></tr>
+      <tr><td>Adversarial pass</td><td>Terms bypass · no login rate-limit · timing enumeration · gateway error shown as bad credentials · swallowed reset message · fractional employee count · missing Back button · raw-500 on malformed API</td><td><span class="badge green">2 as tests, 6 reported</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ── 06 METHODOLOGY ── -->
+<section class="slide">
+  <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
+  <div class="slide-number">06 / 08</div>
+  <h2>How the findings were trusted</h2>
+  <p class="section-subtitle">Every adversarial finding was reproduced, then handed to a second, independent check whose only job was to disprove it.</p>
+  <div class="flow-stages">
+    <div class="flow-stage"><div class="stage-num">1</div><h4>Probe</h4><p>Drive genuinely new ground — API gate bypass, injection, boundaries, rate limiting, timing. Reproduce twice before recording.</p></div>
+    <div class="flow-connector">→</div>
+    <div class="flow-stage"><div class="stage-num">2</div><h4>Refute</h4><p>A separate verifier tries to kill each finding: not reproducible, already-known, expected behaviour, or a sandbox artifact. Default to refuted when unsure.</p></div>
+    <div class="flow-connector">→</div>
+    <div class="flow-stage"><div class="stage-num">3</div><h4>Keep what survives</h4><p>8 of 8 survived; 3 had their severity corrected. The corrections are the proof the refutation was real, not a rubber stamp.</p></div>
+  </div>
+  <ul class="value-list">
+    <li><span class="check">✓</span><div class="text"><h4>Selectors that survive copy changes</h4><p>The questionnaire's radio inputs are unclickable (<code>sr-only</code>); options are targeted by stable <code>formcontrolname</code> + <code>value</code>, not the visible label — which disagrees with the value (&ldquo;Scheduler&rdquo; is <code>Planner</code>).</p></div></li>
+    <li><span class="check">✓</span><div class="text"><h4>App bugs reported, never worked around</h4><p>When the app misbehaved, the test was left describing correct behaviour and the bug was written up — not adjusted to match.</p></div></li>
+  </ul>
+</section>
+
+<!-- ── 07 ENGINEERING ── -->
+<section class="slide">
+  <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
+  <div class="slide-number">07 / 08</div>
+  <h2>Engineering choices worth a look</h2>
+  <p class="section-subtitle">The decisions a reviewer running this cold would notice.</p>
+  <div class="card-grid">
+    <div class="card"><div class="card-icon green">🔑</div><h4>No committed credentials</h4><p>A setup project mints an account via the real signup flow when no <code>.env</code> is present, so a cold clone runs green. Secrets live in <code>.env</code> (gitignored); an independent sweep confirmed none leaked.</p></div>
+    <div class="card"><div class="card-icon blue">🔁</div><h4>Flake, root-caused not retried</h4><p>The Angular questionnaire drops clicks mid-render; every input is now re-applied until it lands (verified 12× with retries off). The residual is the app's own gateway flakiness, left to configured retries.</p></div>
+    <div class="card"><div class="card-icon purple">👁️</div><h4>Watchable headed runs</h4><p><code>npm run test:headed</code> drops to one worker and paces each action, so a reviewer can actually follow the flows instead of windows racing.</p></div>
+    <div class="card"><div class="card-icon orange">🔒</div><h4>TLS reality documented</h4><p>The demo serves a private-CA cert that rolls every 24h; the suite sets <code>ignoreHTTPSErrors</code> and says so plainly — on production that setting would hide a real defect.</p></div>
+  </div>
+</section>
+
+<!-- ── 08 CLOSING ── -->
+<section class="slide title-slide" style="background: radial-gradient(ellipse at 50% 60%, rgba(63,185,80,0.06) 0%, transparent 60%), var(--bg-primary);">
+  <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
+  <div class="slide-number">08 / 08</div>
+  <h1 style="font-size: 40px;">Ready to run, honest about its edges</h1>
+  <p class="subtitle" style="margin-bottom: 28px;">The README carries the full reasoning, the findings, and a candid &ldquo;what I&rsquo;d do next.&rdquo;</p>
+  <div style="max-width:640px;margin:0 auto 32px;text-align:left">
+    <ul class="value-list">
+      <li><span class="check">→</span><div class="text"><h4>What I&rsquo;d do next</h4><p>Raise the Terms/DPA server-side check first — small fix, real legal weight. Move account minting to the API to cut runtime. Add data cleanup for the accounts each run leaves behind.</p></div></li>
+    </ul>
+  </div>
+  <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 36px;">
+    <span class="npm-badge"><span class="pkg">@playwright/test</span><span class="ver">1.62</span></span>
+    <span class="npm-badge"><span class="pkg">@civitas-cerebrum/element-interactions</span><span class="ver">0.3.9</span></span>
+    <span class="npm-badge"><span class="pkg">TypeScript</span><span class="ver">strict</span></span>
+  </div>
+  <div class="title-meta"><span>Umut Ay Bora</span><span>|</span><span>Shiftbase QA technical assignment</span></div>
+</section>
+
+</body>
+</html>
