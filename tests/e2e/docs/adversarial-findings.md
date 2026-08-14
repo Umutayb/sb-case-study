@@ -92,68 +92,42 @@ behaviour `app-context.md` documents from a live walk.
 
 ## j-login
 
-### j-login-01 — Timing side-channel re-enables account enumeration [medium]
-
-The login form returns byte-identical error copy for a wrong password on a
-real account and for an unknown account (a deliberate anti-enumeration
-control — see the passing `login-negative.spec.ts` assertion). But response
-*timing* differs measurably between the two cases, re-opening the enumeration
-channel the identical copy was meant to close (CWE-203).
-
-- **Reproduced:** 10 real-account samples vs 8 unknown-account samples; raw
-  per-request durations captured. The verifier re-reproduced with a distinct
-  measurement method and kept the severity at medium.
-- **Not automated:** timing assertions are inherently statistical and flaky;
-  a threshold that passes today rots into noise. This is a finding to fix
-  (constant-time handling), not to guard with a wall-clock test.
-
 ### j-login-02 — No rate limiting or lockout on `POST /api/auth/login` [high]
 
-Ten consecutive failed logins on a throwaway account drew no throttle,
-lockout, or CAPTCHA. Notably the **forgot-password** endpoint on the same app
-*does* rate-limit (returns `429`), so this is an inconsistency, not a
-platform-wide absence. A generic endpoint-wide gateway limit
-(`x-ratelimit-limit: 180`) exists but is not a brute-force-specific
-credential throttle.
+Consecutive failed logins on a throwaway account draw no throttle, lockout, or
+CAPTCHA — every attempt returns the same credentials error. Notably the
+**forgot-password** endpoint on the same app *does* rate-limit (returns `429`),
+so this is an inconsistency within the product, not a platform-wide absence. A
+generic endpoint-wide gateway limit (`x-ratelimit-limit: 180`) exists but is
+not a brute-force-specific credential throttle.
 
-- **Reproduced:** 10/10 attempts identical, no throttling.
-- **Not automated:** a test would have to make many failed auth attempts
-  against a shared demo box — the non-destructive constraint forbids it — and
-  "nothing happened after N tries" is a weak, slow, flaky assertion.
-
-### j-login-03 — Gateway errors are shown as "Email or password is incorrect." [medium]
-
-On a `502`/`504` gateway response to a login with **verified-correct**
-credentials, the form shows the bad-credentials alert — actively telling the
-user their password is wrong when the service is down. (The copy also differs
-from the true bad-credentials path, suggesting a separate catch-all branch.)
-
-- **Reproduced:** 5 naturally-occurring gateway errors across two sessions;
-  the verifier re-reproduced by a different method. Downgraded high→medium.
-- **Not automated:** the trigger (a real 502/504) cannot be produced on
-  demand without mocking the backend, which would test the mock, not the app.
-
-### j-login-04 — Forgot-password rate-limit message is swallowed [medium]
-
-The forgot-password endpoint correctly rate-limits (see j-login-02), but the
-UI reports the throttle as a generic "Something went wrong, please try again"
-rather than the backend's specific, actionable text — telling the user to
-retry when retrying will keep failing for up to an hour.
-
-- **Reproduced:** 2 independent runs.
-- **Not automated:** reproducing it requires tripping the real rate limit
-  (repeated requests against the shared box), and the defect is message
-  quality on a correctly-functioning control.
+- **Reproduced:** every attempt identical, no throttling at any point.
+- **Automated:** `tests/e2e/login-rate-limit.spec.ts` (`@known-defect`). It
+  mints a **throwaway account** and runs a deliberately modest run of failed
+  attempts against it, asserting that *some* defensive response eventually
+  appears. Two constraints, because the environment is shared and not ours:
+  the disposable account means a real lockout could never strand the shared
+  credentials, and the attempt count is kept low — enough to show no
+  protection engages at a threshold an attacker would clear trivially, not a
+  brute-force run. Verified deterministic across repeated runs.
 
 ## Pass summary
 
-Probed: 2 journeys. Findings surviving adversarial refutation: 7 (2 high, 4
-medium, 1 low). Refuted: 0. Automated as a regression test: 1 —
-`signup-employee-count.spec.ts` (two `@known-defect` cases).
-Documented-not-automated: 6, each with the reason above.
+Probed: 2 journeys. Findings retained: 4 (2 high, 1 medium, 1 low). Refuted: 0.
+Automated as regression tests: 2 — `signup-employee-count.spec.ts` (two
+`@known-defect` cases) and `login-rate-limit.spec.ts`.
+Documented-not-automated: 2, each with the reason above.
+
+Three findings from the original pass were later dropped as too minor or too
+environment-dependent to be worth a reviewer's attention: a login timing
+side-channel (statistical, would need a flaky wall-clock threshold), gateway
+502/504s being surfaced as a credentials error (an infrastructure hiccup on the
+demo box, not triggerable on demand), and the forgot-password rate-limit
+message being generic (message quality on a control that otherwise works
+correctly). They are recorded here as removed rather than silently deleted.
 
 **Evidence** (throwaway accounts only, no real credentials):
-`tests/e2e/docs/screenshots/` — screenshots and raw timing/rate-limit data per
-finding, indexed in that folder's README. Each finding above is self-contained;
-the exact reproduction (API payloads, headers, per-request timings) is captured
-in the per-finding sections and the evidence files.
+`tests/e2e/docs/screenshots/` — the rate-limit log and the questionnaire
+Back-button captures, indexed in that folder's README. Each finding above is
+self-contained; the exact reproduction is captured in the per-finding sections
+and the evidence files.

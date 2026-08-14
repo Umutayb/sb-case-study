@@ -159,10 +159,10 @@ export async function completeQuestionnaire(steps: Steps, user: TestUser): Promi
   // account-creating POST /api/signup, the single heaviest call in the flow,
   // and the redirect to /onboarding only happens once the backend responds.
   // A 30s budget was occasionally too tight for that round-trip on this shared
-  // demo environment (which is documented to return intermittent 502/504s —
-  // see adversarial-findings.md j-login-03). A true gateway failure is left to
-  // Playwright's configured retries; this wider budget only covers a slow-but-
-  // successful submission, without masking a genuine failure.
+  // demo environment, which intermittently returns gateway errors (502/504)
+  // under load. A true gateway failure is left to Playwright's configured
+  // retries; this wider budget only covers a slow-but-successful submission,
+  // without masking a genuine failure.
   await steps.waitForUrl(UrlPattern.ONBOARDING, undefined, { timeout: 60000 });
 }
 

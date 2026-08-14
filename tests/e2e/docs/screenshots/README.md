@@ -12,10 +12,6 @@ the real test account or any credential.
 
 | File | Finding | Shows |
 |---|---|---|
-| `j-login-01-timing-samples.csv` | j-login-01 | Raw per-attempt response durations, real-account vs unknown-account — the timing side-channel data. |
-| `j-login-02-rate-limit-log.txt` | j-login-02 | Ten consecutive failed logins, all identical — no throttle or lockout. |
-| `j-login-03-response-bodies.txt` | j-login-03 | The 502/504 gateway responses that the UI reported as bad credentials. |
-| `j-login-03.png` | j-login-03 | The login form showing "Email or password is incorrect." on a gateway error. |
-| `j-login-04.png` | j-login-04 | The forgot-password form showing the swallowed "Something went wrong. Please try again." in place of the rate-limit message. |
+| `j-login-02-rate-limit-log.txt` | j-login-02 | Consecutive failed logins, all identical — no throttle or lockout. Now also covered by `login-rate-limit.spec.ts`. |
 | `j-signup-onboard-6-01.png` | j-signup-onboard-03 | Questionnaire step 2 with a `Next` button and **no** `Back` button. |
 | `j-signup-onboard-6-01-contrast-step3.png` | j-signup-onboard-03 | A later step for contrast — it *does* carry a `Back` button. |

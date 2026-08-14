@@ -25,7 +25,7 @@ That is the whole setup. **No `.env` is required** — verified by cloning this
 repository fresh and running it with no configuration at all.
 
 **A heads-up on the result before you run it:** `npm test` ends **23 passed,
-5 failed**, and the 5 failures are *intentional*. They are tagged
+6 failed**, and the 6 failures are *intentional*. They are tagged
 `@known-defect` and they document real bugs found in the product — each
 describes the behaviour the app *should* have, so it fails today and becomes a
 regression guard the day the bug is fixed. This is a deliberate choice, not a
@@ -84,7 +84,7 @@ The suite runs identically either way. CI uses `--ignore-scripts`.
 ## What is covered
 
 23 passing tests across three Playwright projects (`setup`, `chromium`,
-`mobile`), plus 5 that fail on purpose against confirmed defects. Each one is
+`mobile`), plus 6 that fail on purpose against confirmed defects. Each one is
 here because it covers a distinct way the flow can break, not to inflate a
 count.
 
@@ -262,10 +262,10 @@ To run without them:
 npm run test:no-defects        # or: npx playwright test --grep-invert @known-defect
 ```
 
-Expected results today: **23 passed, 5 failed** on a full run — the 5 failures
+Expected results today: **23 passed, 6 failed** on a full run — the 6 failures
 are all `@known-defect` (these two duplicate-email tests, the router blank-page
-test, and the two employee-count tests from the adversarial pass below);
-**23 passed** with the known-defect tests excluded.
+test, the two employee-count tests, and the login rate-limit test from the
+exploratory pass below); **23 passed** with the known-defect tests excluded.
 
 One implementation note, since the first version of this test got it wrong:
 it asserts that a conflict message *is present*, not that the questionnaire
@@ -316,8 +316,8 @@ After the functional suite was green, both flows went through a focused
 adversarial pass aimed at the surface ordinary testing skips — API-level
 gate bypass, injection, boundary values, rate limiting, timing side-channels.
 Every finding below was reproduced at least twice, then handed to a separate
-reviewer whose only job was to *disprove* it; these seven are the ones that
-survived. None was refuted. Full reproduction steps are in
+reviewer whose only job was to *disprove* it; the four below are the ones
+retained. None was refuted. Full reproduction steps are in
 [`tests/e2e/docs/adversarial-findings.md`](tests/e2e/docs/adversarial-findings.md).
 
 The headline is worth stating first:
@@ -342,22 +342,19 @@ The rest, by severity after independent review:
 | Finding | Severity | Automated? |
 |---|---|---|
 | Terms/DPA enforced client-side only (API accepts `accept_conditions: false`) | high | Reported — see above |
-| No rate limiting or lockout on `POST /api/auth/login` (yet forgot-password *does* rate-limit) | high | Reported — a test would hammer a shared box |
-| Login timing side-channel re-opens account enumeration despite identical error copy | medium | Reported — timing assertions rot |
-| Gateway errors (502/504) shown to the user as "Email or password is incorrect." | medium | Reported — can't trigger a 502 on demand |
-| Forgot-password rate-limit shown as a generic "Something went wrong" | medium | Reported — needs to trip a real rate limit |
+| No rate limiting or lockout on `POST /api/auth/login` (yet forgot-password *does* rate-limit) | high | **Yes** — `login-rate-limit.spec.ts` |
 | "Number of employees" accepts decimals and unbounded integers | medium | **Yes** — `signup-employee-count.spec.ts` |
 | Questionnaire step 2 has no Back button, unlike every other step | low | Reported — a minor UX inconsistency |
 
-One became a test; the other six are reported, and that split is the honest
-outcome rather than a thin one. Most of these are not things a *portable* suite
-should assert: an on-demand gateway error, a destructive rate-limit probe, a
-wall-clock timing threshold, or an exploit that shouldn't run on every CI
-trigger each make a worse test than a clear report. The one that is clean,
-deterministic, and side-effect-free became a `@known-defect` test — the
-employee-count field accepting `3.33` (a client-side assertion that creates no
-account), built to fail deterministically on the *defect* itself, not on a
-fragile handshake.
+Two became tests, two are reported. The employee-count field accepting `3.33`
+is a client-side assertion that creates no account; the missing login
+rate-limit is proven against a **throwaway account** with a deliberately modest
+number of attempts — enough to show nothing engages, without turning a
+regression run into a brute-force attempt on someone else's environment.
+
+The other two stay reports on purpose. The consent bypass would mean replaying
+the exploit on every CI run (see above), and the missing Back button is a UX
+inconsistency where asserting the *absence* of a control makes a weak guard.
 
 ## Selector strategy
 

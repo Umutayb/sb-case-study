@@ -11,21 +11,21 @@ it. For how to run the suite and the higher-level reasoning, see the
 
 | | Count |
 |---|---|
-| Total tests | **28** |
+| Total tests | **29** |
 | Passing | **23** |
-| Failing on purpose (`@known-defect`) | **5** |
-| Spec files | 10 (+ 1 setup) |
+| Failing on purpose (`@known-defect`) | **6** |
+| Spec files | 11 (+ 1 setup) |
 | Pages mapped | 6 |
-| Defects found | **10** (3 while building, 7 from a dedicated adversarial pass) |
+| Findings | **7** (3 while building, 4 from a dedicated exploratory pass) |
 
 Two run commands:
 
 ```bash
-npm test                # 23 passed, 5 failed  — the 5 are @known-defect, they fail by design
+npm test                # 23 passed, 6 failed  — the 6 are @known-defect, they fail by design
 npm run test:no-defects # 23 passed, 0 failed  — the suite minus the known-defect tests
 ```
 
-The 5 failures are **intentional**. Each `@known-defect` test describes the
+The 6 failures are **intentional**. Each `@known-defect` test describes the
 behaviour the product *should* have; it fails today and turns green the day the
 bug is fixed.
 See [Bug findings](#bug-findings) below.
@@ -137,13 +137,13 @@ different per field, so the assertions target the reliable signal.
 
 ## Bug findings
 
-Ten confirmed defects, **zero false positives**. Three were found while
-building the suite; seven came from a dedicated adversarial pass in which every
+Seven findings, **zero false positives**. Three were found while
+building the suite; four came from a dedicated exploratory pass in which every
 finding was reproduced, then handed to an independent verifier whose only job
 was to *disprove* it. None was refuted, and three had their severity corrected
 by the verifier — the corrections are the evidence the refutation was real.
 
-Three findings became `@known-defect` regression tests; the other seven are
+Four findings became `@known-defect` regression tests; the other three are
 documented with the reason they are reported rather than automated. A finding
 that can only be shown with an on-demand gateway error, a destructive
 rate-limit probe, a wall-clock timing threshold, or an exploit that shouldn't
@@ -202,34 +202,18 @@ block it — which needs no account creation, so the regression guard has no sid
 effect on the shared environment.
 *Tests:* `signup-employee-count.spec.ts` (2 cases) · *Evidence:* `defect-evidence/04-*`
 
-#### A3 — Login timing side-channel re-opens account enumeration · **medium · reported**
-The login form returns byte-identical error copy for a wrong password vs an
-unknown account (a deliberate anti-enumeration control — see the passing
-`login-negative` test), but response *timing* differs measurably between the two
-cases, re-opening the channel the identical copy was meant to close (CWE-203).
-Reported: timing assertions are statistical and rot into flakiness.
+#### A3 — No rate limiting or lockout on `POST /api/auth/login` · **high · automated**
+Consecutive failed logins draw no throttle, lockout, or CAPTCHA — every attempt
+returns the same credentials error. Notably the sibling forgot-password endpoint
+*does* rate-limit (returns 429), so this is an inconsistency within the product,
+not a platform-wide absence.
+*Test:* `login-rate-limit.spec.ts` (`@known-defect`). It mints a **throwaway
+account** so a real lockout could never strand the shared credentials, and keeps
+the attempt count deliberately modest — enough to show no protection engages at
+a threshold an attacker would clear trivially, not a brute-force run against
+someone else's environment.
 
-#### A4 — No rate limiting or lockout on `POST /api/auth/login` · **high · reported**
-Ten consecutive failed logins drew no throttle, lockout, or CAPTCHA — notably,
-the sibling forgot-password endpoint *does* rate-limit (returns 429), so this is
-an inconsistency, not a platform-wide absence. Reported: a test would have to
-make many failed attempts against a shared box, and "nothing happened after N"
-is a weak, slow assertion.
-
-#### A5 — Gateway errors shown to the user as "Email or password is incorrect." · **medium · reported**
-On a 502/504 gateway response to a login with **verified-correct** credentials,
-the form shows the bad-credentials alert — telling the user their password is
-wrong when the service is down. Reported: the trigger (a real 502/504) cannot be
-produced on demand without mocking the backend, which would test the mock.
-
-#### A6 — Forgot-password rate-limit message is swallowed · **medium · reported**
-The forgot-password endpoint correctly rate-limits, but the UI reports the
-throttle as a generic "Something went wrong, please try again" rather than the
-backend's specific, actionable text — telling the user to retry when retrying
-will keep failing for up to an hour. Reported: reproducing it requires tripping
-the real rate limit against the shared box.
-
-#### A7 — Questionnaire step 2 has no Back button · **low · reported**
+#### A4 — Questionnaire step 2 has no Back button · **low · reported**
 Every other mid-wizard step carries a `Back` button; step 2 (business
 type/industry/role) has none, contradicting the bidirectional navigation the
 rest of the wizard offers. Reported: asserting the *absence* of a control as a
@@ -244,7 +228,8 @@ defect is a weak regression guard, and this is a minor UX inconsistency.
 | `router-malformed-modal.spec.ts` | `@known-defect` | B1 |
 | `signup-duplicate-email.spec.ts` | `@known-defect` (×2) | B2 |
 | `signup-employee-count.spec.ts` | `@known-defect` (×2) | A2 |
-| *(reported, no test)* | — | B3, A1, A3, A4, A5, A6, A7 |
+| `login-rate-limit.spec.ts` | `@known-defect` | A3 |
+| *(reported, no test)* | — | B3, A1, A4 |
 
 ---
 

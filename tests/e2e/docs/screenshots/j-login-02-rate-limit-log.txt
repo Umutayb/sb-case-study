@@ -38,7 +38,7 @@ never soft-locked either.
 Contrast: the sibling endpoint POST /api/password/email (forgot-password) on
 this SAME application DOES enforce a rate limit - it returned HTTP 429 with
 body message "Too many password resets requested, try again in 60 minutes"
-after only ~5 rapid submissions in the same session (see j-login-04 evidence).
+after only ~5 rapid submissions in the same session.
 This shows the codebase/infra has rate-limiting capability; it simply is not
 applied to the credential-guessing surface (POST /api/auth/login) where it
 matters most for brute-force protection.

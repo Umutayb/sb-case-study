@@ -295,16 +295,16 @@
   <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
   <div class="slide-number">03 / 08</div>
   <h2>Coverage at a glance</h2>
-  <p class="section-subtitle">28 tests across three Playwright projects: desktop, mobile, and an account-provisioning setup project.</p>
+  <p class="section-subtitle">29 tests across three Playwright projects: desktop, mobile, and an account-provisioning setup project.</p>
   <div class="stat-row" style="justify-content: space-around; margin: 36px 0;">
     <div class="stat"><div class="number">23</div><div class="label">passing tests</div></div>
-    <div class="stat"><div class="number">5</div><div class="label">failing by design</div></div>
+    <div class="stat"><div class="number">6</div><div class="label">failing by design</div></div>
     <div class="stat"><div class="number">6</div><div class="label">pages mapped</div></div>
     <div class="stat"><div class="number">56</div><div class="label">elements</div></div>
-    <div class="stat"><div class="number">10</div><div class="label">observations</div></div>
+    <div class="stat"><div class="number">7</div><div class="label">observations</div></div>
   </div>
   <ul class="value-list">
-    <li><span class="check">✓</span><div class="text"><h4>The 5 failing tests fail on purpose</h4><p>Each is tagged <code>@known-defect</code> and describes the behaviour the product is expected to have — so it fails today and would turn green once addressed, becoming a regression guard. <code>npm run test:no-defects</code> is 23 / 23 green.</p></div></li>
+    <li><span class="check">✓</span><div class="text"><h4>The 6 failing tests fail on purpose</h4><p>Each is tagged <code>@known-defect</code> and describes the behaviour the product is expected to have — so it fails today and would turn green once addressed, becoming a regression guard. <code>npm run test:no-defects</code> is 23 / 23 green.</p></div></li>
     <li><span class="check">✓</span><div class="text"><h4>Not weakened to pass</h4><p>Rewriting a test to agree with unexpected behaviour would make the suite unable to catch it. The failing tests were left describing the expected behaviour instead.</p></div></li>
   </ul>
 </section>
@@ -331,7 +331,7 @@
   <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
   <div class="slide-number">05 / 08</div>
   <h2>What the tests surfaced</h2>
-  <p class="section-subtitle">Ten observations on the demo environment, each reproduced and independently re-checked. Shared as the kind of thing thorough automation is built to catch.</p>
+  <p class="section-subtitle">Seven observations on the demo environment, each reproduced and independently re-checked. Shared as the kind of thing thorough automation is built to catch.</p>
   <div class="card" style="border-color: rgba(210,153,34,0.4); margin-bottom:18px;">
     <div class="version" style="color:var(--accent-orange);background:var(--accent-orange-dim)">Highest priority · consent</div>
     <h4>Terms &amp; Data-Processing-Agreement acceptance is enforced only in the browser</h4>
@@ -341,7 +341,7 @@
     <thead><tr><th>Source</th><th>Observations</th><th>Coverage</th></tr></thead>
     <tbody>
       <tr><td>While building</td><td>Blank page on an unrecognised modal route · duplicate email accepted, then its password rejected at login · no length cap on the name field</td><td><span class="badge green">2 of 3 as tests</span></td></tr>
-      <tr><td>Exploratory pass</td><td>Consent bypass · no login rate-limit · timing enumeration · gateway error shown as bad credentials · swallowed reset message · fractional employee count · missing Back button</td><td><span class="badge green">1 as test, 6 reported</span></td></tr>
+      <tr><td>Exploratory pass</td><td>Consent bypass · no login rate-limit · fractional employee count · missing Back button</td><td><span class="badge green">2 as tests, 2 reported</span></td></tr>
     </tbody>
   </table>
 </section>
@@ -357,7 +357,7 @@
     <div class="flow-connector">→</div>
     <div class="flow-stage"><div class="stage-num">2</div><h4>Re-check</h4><p>A separate pass tries to rule each one out: not reproducible, expected behaviour, already known, or an artifact of the sandbox. When unsure, discard.</p></div>
     <div class="flow-connector">→</div>
-    <div class="flow-stage"><div class="stage-num">3</div><h4>Keep what holds</h4><p>All seven held up; three had their priority adjusted down on the second look — evidence the re-check was real, not a rubber stamp.</p></div>
+    <div class="flow-stage"><div class="stage-num">3</div><h4>Keep what holds</h4><p>All four retained findings held up under the second look, with priorities adjusted where the re-check warranted it — evidence it was real, not a rubber stamp.</p></div>
   </div>
   <ul class="value-list">
     <li><span class="check">✓</span><div class="text"><h4>Selectors that survive copy changes</h4><p>The questionnaire&rsquo;s radio inputs aren&rsquo;t directly clickable (<code>sr-only</code>); options are targeted by their stable <code>formcontrolname</code> + <code>value</code>, not the visible label &mdash; which can differ from the value.</p></div></li>
