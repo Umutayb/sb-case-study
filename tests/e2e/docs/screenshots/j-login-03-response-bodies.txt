@@ -9,9 +9,13 @@ Request:  POST https://app.sb036c506.demo.shiftbase.co/api/auth/login
 Status:   504 (mimeType text/plain, duration 4ms)
 Body:     "Gateway Timeout"
 Credentials submitted: qa.candidate+sb-lg1786689442@example.com / [REDACTED]
-  (this is the CORRECT, just-registered password for this throwaway account —
-  confirmed correct by a retry two clicks later that succeeded with HTTP 200
-  and proceeded to /login/mfa-promote)
+  (the password submitted here was the CORRECT, just-registered password for
+  this throwaway probe account — confirmed correct by a retry two clicks later
+  that succeeded with HTTP 200 and proceeded to /login/mfa-promote. The literal
+  value is redacted: a working password to the target system, even for a
+  throwaway account, must not ship in the repository. The finding — a 504
+  gateway error shown to the user as "Email or password is incorrect." despite
+  verified-correct credentials — stands without it.)
 UI shown to user: alert "Email or password is incorrect."
 
 === Occurrence 2 (2026-08-14T06:58:04Z) — HTTP 502, retry loop attempt 1 ===

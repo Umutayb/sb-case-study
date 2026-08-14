@@ -24,6 +24,18 @@ npm test
 That is the whole setup. **No `.env` is required** — verified by cloning this
 repository fresh and running it with no configuration at all.
 
+**A heads-up on the result before you run it:** `npm test` ends **23 passed,
+6 failed**, and the 6 failures are *intentional*. They are tagged
+`@known-defect` and they document real bugs found in the product — each
+describes the behaviour the app *should* have, so it fails today and becomes a
+regression guard the day the bug is fixed. This is a deliberate choice, not a
+broken suite (the reasoning is under "Defects found while building this" and
+"Adversarial findings" below). To run only the tests that should pass:
+
+```bash
+npm run test:no-defects        # 23 passed, 0 failed
+```
+
 `npm run test:report` opens the HTML report.
 
 ### Watching it run
