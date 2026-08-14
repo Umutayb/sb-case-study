@@ -27,9 +27,8 @@ npm run test:no-defects # 23 passed, 0 failed  — the suite minus the known-def
 
 The 6 failures are **intentional**. Each `@known-defect` test describes the
 behaviour the product *should* have; it fails today and turns green the day the
-bug is fixed, becoming a regression guard with no edit. They were never
-weakened to pass — a test rewritten to agree with a bug can no longer detect
-it. See [Bug findings](#bug-findings) below.
+bug is fixed. 
+See [Bug findings](#bug-findings) below.
 
 ---
 
