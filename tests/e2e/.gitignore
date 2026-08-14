@@ -3,7 +3,7 @@ test-results/
 .last-run.json
 bug-evidence/
 
-# Harness ledgers — bookkeeping for the authoring run, not part of the suite.
+# Harness ledgers — machine bookkeeping for the authoring run, not the suite.
 docs/onboarding-status.json
 docs/.ledger-integrity.json
 docs/.workflow-approvers.json
@@ -11,4 +11,5 @@ docs/.phase4-cycle-state.json
 docs/.phase4-concurrency-log.jsonl
 docs/.subagent-returns/
 docs/coverage-expansion-state.json
-docs/adversarial-findings.md
+# NOTE: docs/adversarial-findings.md is intentionally NOT ignored — it is the
+# Phase-6 bug report, a real deliverable, and ships with the suite.

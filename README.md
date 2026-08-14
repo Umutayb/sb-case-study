@@ -284,6 +284,54 @@ Worth knowing, and recorded in `tests/e2e/docs/app-context.md`:
   reliable signal across all six, which is why the specs assert on it rather
   than on message text.
 
+## Adversarial findings from a dedicated probing pass
+
+After the functional suite was green, both flows went through a focused
+adversarial pass aimed at the surface ordinary testing skips — API-level
+gate bypass, injection, boundary values, rate limiting, timing side-channels.
+Every finding below was reproduced at least twice, then handed to a separate
+reviewer whose only job was to *disprove* it; these eight are the ones that
+survived. None was refuted. Full reproduction steps are in
+[`tests/e2e/docs/adversarial-findings.md`](tests/e2e/docs/adversarial-findings.md).
+
+The headline is worth stating first:
+
+**Terms and Data-Processing-Agreement acceptance is enforced only in the
+browser.** `POST /api/signup` accepts a fully valid payload with
+`accept_conditions: false` and returns HTTP 200, creating a real, usable
+account — the required consent checkbox has no server-side counterpart. On a
+workforce-management platform that will go on to process employees' personal
+data, an account created with a false record of DPA acceptance is a genuine
+compliance concern. It was reproduced from two fresh anonymous sessions, each
+with a legitimately obtained reCAPTCHA token, followed by a successful login.
+
+I deliberately did **not** write a regression test for it. A test would replay
+the exploit on every CI run — repeatedly creating accounts that falsely record
+consent, against a shared demo environment. Automating a compliance bypass so
+it fires on every push is the wrong thing to ship; the finding belongs in a
+report, and the fix belongs server-side.
+
+The rest, by severity after independent review:
+
+| Finding | Severity | Automated? |
+|---|---|---|
+| Terms/DPA enforced client-side only (API accepts `accept_conditions: false`) | high | Reported — see above |
+| No rate limiting or lockout on `POST /api/auth/login` (yet forgot-password *does* rate-limit) | high | Reported — a test would hammer a shared box |
+| Login timing side-channel re-opens account enumeration despite identical error copy | medium | Reported — timing assertions rot |
+| Gateway errors (502/504) shown to the user as "Email or password is incorrect." | medium | Reported — can't trigger a 502 on demand |
+| Forgot-password rate-limit shown as a generic "Something went wrong" | medium | Reported — needs to trip a real rate limit |
+| "Number of employees" accepts decimals and unbounded integers | medium | **Yes** — `signup-employee-count.spec.ts` |
+| Questionnaire step 2 has no Back button, unlike every other step | low | Reported — a minor UX inconsistency |
+| `POST /api/signup` returns a raw HTML 500 on a missing-field payload | low | Reported — API-only, no user reaches it |
+
+Only one became a test, and that is the honest outcome rather than a thin one:
+most of these are not things a *portable* suite should assert. An on-demand
+gateway error, a destructive rate-limit probe, a wall-clock timing threshold,
+or an exploit that shouldn't run on every CI trigger each make a worse test
+than a clear report. The one that is clean, deterministic, and side-effect-free
+— the employee-count field accepting `3.33` — became a `@known-defect` test
+that asserts the client gate should block it, without creating an account.
+
 ## Selector strategy
 
 Locators live in `tests/e2e/page-repository.json`, one entry per element,
@@ -331,6 +379,11 @@ Stated so the omissions read as decisions rather than gaps:
 
 ## What I would do next
 
+- **Raise the Terms/DPA server-side-enforcement finding first.** It is the one
+  finding with legal weight, and the fix is small: reject
+  `accept_conditions: false` at `/api/signup` rather than trusting the form.
+  Everything else on this list is engineering hygiene; this one is a
+  compliance control that currently does not exist where it matters.
 - **Move signup setup to the API.** The questionnaire is eight UI steps that the
   login specs do not care about. Minting accounts through the signup endpoint
   would cut most of the suite's runtime and leave the UI walk to the one spec

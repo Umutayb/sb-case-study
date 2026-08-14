@@ -1,0 +1,53 @@
+Evidence for j-login-03 — misleading "Email or password is incorrect." shown on
+backend gateway failures at POST /api/auth/login.
+
+Captured via `playwright-cli requests` / `request <n>` / `response-body <n>` against
+a live session, session slug probe-j-login, 2026-08-14 ~06:54-07:01 UTC.
+
+=== Occurrence 1 (2026-08-14T06:54:04Z) — HTTP 504 ===
+Request:  POST https://app.sb036c506.demo.shiftbase.co/api/auth/login
+Status:   504 (mimeType text/plain, duration 4ms)
+Body:     "Gateway Timeout"
+Credentials submitted: qa.candidate+sb-lg1786689442@example.com / [REDACTED]
+  (this is the CORRECT, just-registered password for this throwaway account —
+  confirmed correct by a retry two clicks later that succeeded with HTTP 200
+  and proceeded to /login/mfa-promote)
+UI shown to user: alert "Email or password is incorrect."
+
+=== Occurrence 2 (2026-08-14T06:58:04Z) — HTTP 502, retry loop attempt 1 ===
+Request:  POST https://app.sb036c506.demo.shiftbase.co/api/auth/login
+Status:   502 Bad Gateway
+UI shown to user: "Email or password is incorrect." (confirmed via snapshot + screenshot, see j-login-03.png)
+
+=== Occurrence 3 (2026-08-14T06:58:xxZ) — HTTP 502, retry loop attempt 2 ===
+Same as above, status 502 Bad Gateway.
+
+=== Occurrence 4 (2026-08-14T06:58:xxZ) — HTTP 502, retry loop attempt 3 ===
+Same as above, status 502 Bad Gateway.
+
+=== Occurrence 5 (2026-08-14T06:59:52Z) — HTTP 502, explicit re-check ===
+Request:  POST https://app.sb036c506.demo.shiftbase.co/api/auth/login
+Status:   502 Bad Gateway
+Response headers: content-type: text/plain, content-length: 11
+Response body: "Bad Gateway"
+UI shown: same alert, "Email or password is incorrect." (screenshot captured,
+see tests/e2e/docs/screenshots/j-login-03.png)
+
+=== Occurrence 6 (2026-08-14T07:01:25Z) — final re-check before wrap-up ===
+GET https://app.sb036c506.demo.shiftbase.co/api/auth/login (page-load auth-status
+probe, not the submit) also returned 502 — endpoint was still degraded when this
+probe session ended, roughly 7 minutes after the first occurrence.
+
+Note on GET /api/auth/login: this is an unauthenticated status-check request the
+SPA fires on every page load (also visible returning 401 in the app's normal
+healthy state, e.g. request #41 in earlier successful sessions this pass) — its
+502 here is additional evidence the auth backend/gateway was unhealthy, not that
+credentials were involved in triggering the failure.
+
+Conclusion: across 5+ independent submit attempts with verified-correct
+credentials, spanning both a 504 (Gateway Timeout) and repeated 502 (Bad
+Gateway) responses over a ~7-minute window, the login form never varied its
+message — it always rendered the generic "Email or password is incorrect."
+alert, identical to what a genuine bad-password attempt produces. The frontend
+does not distinguish an infrastructure/gateway failure from an actual
+authentication rejection.

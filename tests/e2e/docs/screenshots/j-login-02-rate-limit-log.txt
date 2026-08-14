@@ -1,0 +1,44 @@
+Evidence for j-login-02 — no throttling/lockout observed on POST /api/auth/login
+after 10 consecutive failed attempts against a real account.
+
+Account under test: qa.candidate+sb-lg1786689442@example.com (throwaway account
+minted via signup specifically for this probe — not the shared .env credential).
+
+Method: for each attempt, navigate fresh to /login, fill email + a distinct wrong
+password, click "Log in", then read the resulting network request's status code
+and server-reported duration via `playwright-cli requests` / `request <n>`.
+
+label,request#,status,server-duration,wall-clock
+real-wrong-1,59,[400],427ms,wall=2058ms
+real-wrong-2,59,[400],412ms,wall=2098ms
+real-wrong-3,59,[400],410ms,wall=2050ms
+real-wrong-4,59,[400],364ms,wall=2082ms
+real-wrong-5,59,[400],440ms,wall=2368ms
+real-wrong-6,59,[400],299ms,wall=2084ms
+real-wrong-7,59,[400],336ms,wall=2063ms
+real-wrong-7b,59,[400],406ms,wall=2038ms
+real-wrong-9,59,[400],414ms,wall=2057ms
+real-wrong-10,60,[400],391ms,wall=2058ms
+real-correct-after10fails,59,[200],671ms,wall=2235ms   <- immediately succeeded
+
+10/10 consecutive wrong-password attempts returned HTTP 400 with the identical
+body:
+{"data":[],"meta":{"status":"error","status_message":"Unable to log you in with
+the supplied credentials","feedback":[{"message":"Unable to log you in with the
+supplied credentials","level":"error"}],"version":"production"}}
+
+No 429, no CAPTCHA challenge injected into the DOM, no "account locked" /
+"too many attempts" messaging at any point, and no escalating delay (durations
+stayed in the same ~300-440ms band throughout, they did not grow attempt over
+attempt the way a server-side incremental backoff would produce). Immediately
+after the 10th failure, the SAME account logged in successfully on the very
+next attempt with its correct password (HTTP 200) - confirming the account was
+never soft-locked either.
+
+Contrast: the sibling endpoint POST /api/password/email (forgot-password) on
+this SAME application DOES enforce a rate limit - it returned HTTP 429 with
+body message "Too many password resets requested, try again in 60 minutes"
+after only ~5 rapid submissions in the same session (see j-login-04 evidence).
+This shows the codebase/infra has rate-limiting capability; it simply is not
+applied to the credential-guessing surface (POST /api/auth/login) where it
+matters most for brute-force protection.
