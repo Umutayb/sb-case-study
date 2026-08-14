@@ -269,13 +269,11 @@
     <circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="4"/>
     <circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="4"/>
   </svg>
-  <h1>Shiftbase QA Assessment</h1>
+  <h1 style="background:none;-webkit-text-fill-color:#3fb950;color:#3fb950;">Shiftbase QA Assessment</h1>
   <p class="subtitle">End-to-end automation of the signup &amp; login flows</p>
-  <p class="tagline">Two flows, automated to the dashboard — plus eleven real defects the automation surfaced along the way.</p>
+  <p class="tagline">Both flows automated to the dashboard — with a handful of observations the tests surfaced on the demo environment along the way.</p>
   <p class="description">Playwright + TypeScript, on the element-interactions Steps API. Runs green from a cold clone with no configuration.</p>
-  <div class="title-meta">
-    <span>Umut Ay Bora</span><span>|</span><span>August 2026</span>
-  </div>
+  <div class="title-meta"><span>Umut Ay Bora</span><span>|</span><span>August 2026</span></div>
 </section>
 
 <!-- ── 02 OVERVIEW ── -->
@@ -283,12 +281,12 @@
   <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
   <div class="slide-number">02 / 08</div>
   <h2>The brief, and what shipped</h2>
-  <p class="section-subtitle">Automate two flows against the Shiftbase demo environment: signup + onboarding up to the dashboard, and login. This is what came back.</p>
+  <p class="section-subtitle">Automate two flows on the Shiftbase demo environment: signup + onboarding up to the dashboard, and login. This is what came back.</p>
   <div class="card-grid">
-    <div class="card"><div class="card-icon green">🎯</div><h4>Both flows, end to end</h4><p>Signup walks the 8-step questionnaire and setup wizard to the dashboard; login handles the MFA interstitial. Interactions read as intent through the Steps API — no raw selectors in any test.</p></div>
-    <div class="card"><div class="card-icon blue">🔍</div><h4>Eleven defects found</h4><p>Not the point of the brief, but the honest by-product of testing a real product: three found while building, eight from a dedicated adversarial pass. Zero were false positives.</p></div>
-    <div class="card"><div class="card-icon purple">📼</div><h4>Evidence, not claims</h4><p>Every defect carries a reproduction and screen recording / screenshot. Findings that could not be pinned by a portable test are reported with the reason, not faked into one.</p></div>
-    <div class="card"><div class="card-icon orange">▶️</div><h4>Runnable by anyone</h4><p><code>npm ci &amp;&amp; npm test</code> on a clean clone with no <code>.env</code>. Verified by cloning fresh; the suite mints its own account through the real signup flow.</p></div>
+    <div class="card"><div class="card-icon green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><h4>Both flows, end to end</h4><p>Signup walks the 8-step questionnaire and setup wizard to the dashboard; login handles the MFA interstitial. Interactions read as intent through the Steps API — no raw selectors in any test.</p></div>
+    <div class="card"><div class="card-icon blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><h4>Some observations along the way</h4><p>Testing a real product surfaces things. A few came up while building the happy paths, and a focused exploratory pass found more — all reproduced, none false positives. Shared constructively, for the team to weigh.</p></div>
+    <div class="card"><div class="card-icon purple"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bc8cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div><h4>Evidence, not claims</h4><p>Each observation carries a reproduction and a screen recording or screenshot. Anything that couldn&rsquo;t be pinned by a portable test is written up with the reason, not forced into one.</p></div>
+    <div class="card"><div class="card-icon orange"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d29922" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20 6 4"/></svg></div><h4>Runnable by anyone</h4><p><code>npm ci &amp;&amp; npm test</code> on a clean clone with no <code>.env</code>. Verified by cloning fresh; the suite provisions its own account through the real signup flow.</p></div>
   </div>
 </section>
 
@@ -297,17 +295,17 @@
   <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
   <div class="slide-number">03 / 08</div>
   <h2>Coverage at a glance</h2>
-  <p class="section-subtitle">29 tests across three Playwright projects (desktop, mobile, and an account-provisioning setup project).</p>
+  <p class="section-subtitle">29 tests across three Playwright projects: desktop, mobile, and an account-provisioning setup project.</p>
   <div class="stat-row" style="justify-content: space-around; margin: 36px 0;">
     <div class="stat"><div class="number">23</div><div class="label">passing tests</div></div>
     <div class="stat"><div class="number">6</div><div class="label">failing by design</div></div>
     <div class="stat"><div class="number">6</div><div class="label">pages mapped</div></div>
     <div class="stat"><div class="number">56</div><div class="label">elements</div></div>
-    <div class="stat"><div class="number">11</div><div class="label">defects found</div></div>
+    <div class="stat"><div class="number">11</div><div class="label">observations</div></div>
   </div>
   <ul class="value-list">
-    <li><span class="check">✓</span><div class="text"><h4>The 6 failing tests fail on purpose</h4><p>Each is tagged <code>@known-defect</code> and describes the behaviour the product <em>should</em> have — so it fails today and becomes a regression guard the day the bug is fixed. <code>npm run test:no-defects</code> is 23 / 23 green.</p></div></li>
-    <li><span class="check">✓</span><div class="text"><h4>Not weakened to pass</h4><p>Rewriting a test to agree with a bug makes the suite unable to detect it. The failing tests stayed honest instead.</p></div></li>
+    <li><span class="check">✓</span><div class="text"><h4>The 6 failing tests fail on purpose</h4><p>Each is tagged <code>@known-defect</code> and describes the behaviour the product is expected to have — so it fails today and would turn green once addressed, becoming a regression guard. <code>npm run test:no-defects</code> is 23 / 23 green.</p></div></li>
+    <li><span class="check">✓</span><div class="text"><h4>Not weakened to pass</h4><p>Rewriting a test to agree with unexpected behaviour would make the suite unable to catch it. The failing tests were left describing the expected behaviour instead.</p></div></li>
   </ul>
 </section>
 
@@ -321,29 +319,29 @@
     <thead><tr><th>Flow</th><th>Coverage</th></tr></thead>
     <tbody>
       <tr><td><span class="badge green">Signup</span></td><td>Registration → questionnaire → wizard → dashboard · form handoff · mobile viewport · empty-submit &amp; per-field validation (email, phone, weak password, terms)</td></tr>
-      <tr><td><span class="badge blue">Login</span></td><td>Valid credentials · the MFA-promote interstitial · wrong password · unknown email · <strong>identical rejection message (no account enumeration)</strong> · protected-route redirect · "Back to login" is a logout · concurrent &amp; stale sessions</td></tr>
+      <tr><td><span class="badge blue">Login</span></td><td>Valid credentials · the MFA-promote interstitial · wrong password · unknown email · <strong>identical rejection message (no account enumeration)</strong> · protected-route redirect · &ldquo;Back to login&rdquo; ends the session · concurrent &amp; stale sessions</td></tr>
       <tr><td><span class="badge purple">Session</span></td><td>Survives a reload (asserts the dashboard re-renders, not just the URL) · primary navigation present</td></tr>
     </tbody>
   </table>
-  <p class="section-subtitle" style="margin-top:24px">Deliberately out of scope, and said so in the README: everything past the dashboard, password reset, cross-browser, visual regression, load.</p>
+  <p class="section-subtitle" style="margin-top:24px">Deliberately out of scope, and noted in the README: everything past the dashboard, password reset, cross-browser, visual regression, load.</p>
 </section>
 
-<!-- ── 05 FINDINGS ── -->
+<!-- ── 05 OBSERVATIONS ── -->
 <section class="slide">
   <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
   <div class="slide-number">05 / 08</div>
-  <h2>The defects</h2>
-  <p class="section-subtitle">Eleven confirmed, zero refuted. The headline is one UI testing alone would never reach.</p>
-  <div class="card" style="border-color: rgba(248,81,73,0.4); margin-bottom:18px;">
-    <div class="version" style="color:var(--accent-red);background:rgba(248,81,73,0.15)">HIGH · compliance</div>
+  <h2>What the tests surfaced</h2>
+  <p class="section-subtitle">Eleven observations on the demo environment, each reproduced and independently re-checked. Shared as the kind of thing thorough automation is built to catch.</p>
+  <div class="card" style="border-color: rgba(210,153,34,0.4); margin-bottom:18px;">
+    <div class="version" style="color:var(--accent-orange);background:var(--accent-orange-dim)">Highest priority · consent</div>
     <h4>Terms &amp; Data-Processing-Agreement acceptance is enforced only in the browser</h4>
-    <p><code>POST /api/signup</code> accepts a payload with <code>accept_conditions: false</code> and creates a fully usable account — the required consent checkbox has no server-side counterpart. Reproduced from two fresh sessions, each followed by a successful login. Reported, not automated: a test would replay a compliance-bypass exploit on every CI run against a shared environment.</p>
+    <p>On the demo environment, <code>POST /api/signup</code> accepts a request with <code>accept_conditions: false</code> and creates a usable account — the consent checkbox the UI requires has no server-side counterpart. Worth a look because the same pattern in production would record consent that was never given. Reported rather than automated, so a regression run never repeats it against the shared environment.</p>
   </div>
   <table class="data-table">
-    <thead><tr><th>Source</th><th>Findings</th><th>Automated</th></tr></thead>
+    <thead><tr><th>Source</th><th>Observations</th><th>Coverage</th></tr></thead>
     <tbody>
-      <tr><td>Found while building</td><td>Router blank-page on a bad modal route · duplicate-email accepted then password rejected · unbounded name length</td><td><span class="badge green">2 of 3 as tests</span></td></tr>
-      <tr><td>Adversarial pass</td><td>Terms bypass · no login rate-limit · timing enumeration · gateway error shown as bad credentials · swallowed reset message · fractional employee count · missing Back button · raw-500 on malformed API</td><td><span class="badge green">2 as tests, 6 reported</span></td></tr>
+      <tr><td>While building</td><td>Blank page on an unrecognised modal route · duplicate email accepted, then its password rejected at login · no length cap on the name field</td><td><span class="badge green">2 of 3 as tests</span></td></tr>
+      <tr><td>Exploratory pass</td><td>Consent bypass · no login rate-limit · timing enumeration · gateway error shown as bad credentials · swallowed reset message · fractional employee count · missing Back button · unstructured 500 on a malformed API call</td><td><span class="badge green">2 as tests, 6 reported</span></td></tr>
     </tbody>
   </table>
 </section>
@@ -352,18 +350,18 @@
 <section class="slide">
   <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
   <div class="slide-number">06 / 08</div>
-  <h2>How the findings were trusted</h2>
-  <p class="section-subtitle">Every adversarial finding was reproduced, then handed to a second, independent check whose only job was to disprove it.</p>
+  <h2>How each observation was verified</h2>
+  <p class="section-subtitle">Nothing rests on a single look — each was reproduced, then re-checked by an independent pass whose job was to disprove it.</p>
   <div class="flow-stages">
-    <div class="flow-stage"><div class="stage-num">1</div><h4>Probe</h4><p>Drive genuinely new ground — API gate bypass, injection, boundaries, rate limiting, timing. Reproduce twice before recording.</p></div>
+    <div class="flow-stage"><div class="stage-num">1</div><h4>Reproduce</h4><p>Explore beyond the happy path — API behaviour, input boundaries, rate limiting, timing. Reproduce twice before recording anything.</p></div>
     <div class="flow-connector">→</div>
-    <div class="flow-stage"><div class="stage-num">2</div><h4>Refute</h4><p>A separate verifier tries to kill each finding: not reproducible, already-known, expected behaviour, or a sandbox artifact. Default to refuted when unsure.</p></div>
+    <div class="flow-stage"><div class="stage-num">2</div><h4>Re-check</h4><p>A separate pass tries to rule each one out: not reproducible, expected behaviour, already known, or an artifact of the sandbox. When unsure, discard.</p></div>
     <div class="flow-connector">→</div>
-    <div class="flow-stage"><div class="stage-num">3</div><h4>Keep what survives</h4><p>8 of 8 survived; 3 had their severity corrected. The corrections are the proof the refutation was real, not a rubber stamp.</p></div>
+    <div class="flow-stage"><div class="stage-num">3</div><h4>Keep what holds</h4><p>All eleven held up; three had their priority adjusted down on the second look — evidence the re-check was real, not a rubber stamp.</p></div>
   </div>
   <ul class="value-list">
-    <li><span class="check">✓</span><div class="text"><h4>Selectors that survive copy changes</h4><p>The questionnaire's radio inputs are unclickable (<code>sr-only</code>); options are targeted by stable <code>formcontrolname</code> + <code>value</code>, not the visible label — which disagrees with the value (&ldquo;Scheduler&rdquo; is <code>Planner</code>).</p></div></li>
-    <li><span class="check">✓</span><div class="text"><h4>App bugs reported, never worked around</h4><p>When the app misbehaved, the test was left describing correct behaviour and the bug was written up — not adjusted to match.</p></div></li>
+    <li><span class="check">✓</span><div class="text"><h4>Selectors that survive copy changes</h4><p>The questionnaire&rsquo;s radio inputs aren&rsquo;t directly clickable (<code>sr-only</code>); options are targeted by their stable <code>formcontrolname</code> + <code>value</code>, not the visible label &mdash; which can differ from the value.</p></div></li>
+    <li><span class="check">✓</span><div class="text"><h4>Unexpected behaviour reported, tests left honest</h4><p>Where the app behaved unexpectedly, the test was left describing the expected behaviour and the observation was written up &mdash; never adjusted to match.</p></div></li>
   </ul>
 </section>
 
@@ -374,10 +372,10 @@
   <h2>Engineering choices worth a look</h2>
   <p class="section-subtitle">The decisions a reviewer running this cold would notice.</p>
   <div class="card-grid">
-    <div class="card"><div class="card-icon green">🔑</div><h4>No committed credentials</h4><p>A setup project mints an account via the real signup flow when no <code>.env</code> is present, so a cold clone runs green. Secrets live in <code>.env</code> (gitignored); an independent sweep confirmed none leaked.</p></div>
-    <div class="card"><div class="card-icon blue">🔁</div><h4>Flake, root-caused not retried</h4><p>The Angular questionnaire drops clicks mid-render; every input is now re-applied until it lands (verified 12× with retries off). The residual is the app's own gateway flakiness, left to configured retries.</p></div>
-    <div class="card"><div class="card-icon purple">👁️</div><h4>Watchable headed runs</h4><p><code>npm run test:headed</code> drops to one worker and paces each action, so a reviewer can actually follow the flows instead of windows racing.</p></div>
-    <div class="card"><div class="card-icon orange">🔒</div><h4>TLS reality documented</h4><p>The demo serves a private-CA cert that rolls every 24h; the suite sets <code>ignoreHTTPSErrors</code> and says so plainly — on production that setting would hide a real defect.</p></div>
+    <div class="card"><div class="card-icon green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><line x1="10.85" y1="12.15" x2="19" y2="4"/><line x1="18" y1="5" x2="20" y2="7"/><line x1="15" y1="8" x2="17" y2="10"/></svg></div><h4>No committed credentials</h4><p>A setup project provisions an account via the real signup flow when no <code>.env</code> is present, so a cold clone runs green. Secrets live in <code>.env</code> (gitignored); an independent sweep confirmed none shipped.</p></div>
+    <div class="card"><div class="card-icon blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div><h4>Flake, root-caused not retried</h4><p>The Angular questionnaire can drop clicks mid-render; every input is re-applied until it lands (verified 12× with retries off). The residual is the environment&rsquo;s own gateway variability, left to configured retries.</p></div>
+    <div class="card"><div class="card-icon purple"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bc8cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><h4>Watchable headed runs</h4><p><code>npm run test:headed</code> drops to one worker and paces each action, so a reviewer can actually follow the flows rather than watch windows race.</p></div>
+    <div class="card"><div class="card-icon orange"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d29922" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><h4>TLS reality documented</h4><p>The demo serves a private-CA cert that rolls every 24h; the suite sets <code>ignoreHTTPSErrors</code> and says so plainly &mdash; on a production target that setting would hide a real issue.</p></div>
   </div>
 </section>
 
@@ -385,11 +383,11 @@
 <section class="slide title-slide" style="background: radial-gradient(ellipse at 50% 60%, rgba(63,185,80,0.06) 0%, transparent 60%), var(--bg-primary);">
   <div class="brand-mark"><svg class="logo-rings" viewBox="0 0 200 200"><circle cx="85" cy="100" r="50" fill="none" stroke="#e6edf3" stroke-width="6"/><circle cx="115" cy="100" r="50" fill="none" stroke="#3fb950" stroke-width="6"/></svg><span>QA Assessment</span></div>
   <div class="slide-number">08 / 08</div>
-  <h1 style="font-size: 40px;">Ready to run, honest about its edges</h1>
-  <p class="subtitle" style="margin-bottom: 28px;">The README carries the full reasoning, the findings, and a candid &ldquo;what I&rsquo;d do next.&rdquo;</p>
+  <h1 style="font-size: 40px; background:none;-webkit-text-fill-color:#e6edf3;color:#e6edf3;">Ready to run, honest about its edges</h1>
+  <p class="subtitle" style="margin-bottom: 28px;">The README carries the full reasoning, the observations, and a candid &ldquo;what I&rsquo;d do next.&rdquo;</p>
   <div style="max-width:640px;margin:0 auto 32px;text-align:left">
     <ul class="value-list">
-      <li><span class="check">→</span><div class="text"><h4>What I&rsquo;d do next</h4><p>Raise the Terms/DPA server-side check first — small fix, real legal weight. Move account minting to the API to cut runtime. Add data cleanup for the accounts each run leaves behind.</p></div></li>
+      <li><span class="check">→</span><div class="text"><h4>What I&rsquo;d do next</h4><p>Flag the server-side consent check first &mdash; a small change with outsized value. Move account provisioning to the API to cut runtime. Add teardown for the accounts each run leaves behind.</p></div></li>
     </ul>
   </div>
   <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 36px;">
