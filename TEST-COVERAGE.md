@@ -208,6 +208,12 @@ exception (`<h2>An Internal Error Has Occurred.</h2>`, HTML, not JSON) rather
 than a structured 4xx. No account is created, so there is no data-integrity
 fallout — an error-handling gap only. The contract test derives everything live
 (no hardcoded reCAPTCHA/cookies) so it fails deterministically on the assertion.
+**UI-side checked:** a user cannot reach this through the browser — the
+Angular reactive form re-validates on `Next` and blocks advancing without
+valid input, holding even when the disabled `Next` button is force-enabled via
+the DOM (verified on the registration and industry/role steps; no `/api/signup`
+call fired). The incomplete payload is only reachable by calling the endpoint
+directly, so this is an API-contract gap with no user-facing path.
 *Test:* `signup-api-contract.spec.ts`
 
 #### A4 — Login timing side-channel re-opens account enumeration · **medium · reported**

@@ -100,6 +100,16 @@ there is no data-integrity fallout — an error-handling gap only.
 
 - **Reproduced:** 2 identical reproductions; narrowed to the missing
   questionnaire fields specifically.
+- **UI-side verified (2026-08-14):** a user cannot trigger this through the
+  browser. The questionnaire is an Angular reactive form that re-validates in
+  the `Next` handler and refuses to advance a step without valid input — and
+  it holds even under DOM tampering: force-enabling the disabled `Next` button
+  (stripping `disabled` / `aria-disabled`) and clicking it left the wizard on
+  the same step with the fields marked invalid, on both the registration step
+  and the industry/role step whose absence causes the 500. No `/api/signup`
+  request fired during any bypass attempt. So the incomplete payload is only
+  reachable by calling the endpoint directly, outside the browser — confirming
+  this is an API-contract gap with no user-facing path, not merely assuming it.
 - **Automated:** `tests/e2e/signup-api-contract.spec.ts` (`@known-defect`).
   It sends a deliberately-incomplete `POST /api/signup` and asserts a
   structured error rather than a raw 500. Live probing during authoring showed
