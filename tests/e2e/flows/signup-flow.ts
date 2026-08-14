@@ -57,22 +57,43 @@ async function nextBecomesEnabled(steps: Steps, timeoutMs = 5000): Promise<boole
 }
 
 /**
- * Selects an answer, then advances.
+ * Fills a questionnaire field and confirms the value actually stuck.
+ *
+ * `fill` can be lost to the same step re-render that drops label clicks: the
+ * input is re-created between the fill and its commit, and the value never
+ * lands. A single verify surfaces that as a clean failure, but the fix is to
+ * re-fill — so this re-fills in a bounded loop until the field holds the value,
+ * then leaves the final assertion to the caller / the last read here.
+ */
+async function fillUntilValue(steps: Steps, element: string, value: string): Promise<void> {
+  for (let attempt = 0; attempt < 4; attempt++) {
+    await steps.fill(element, QUIZ, value);
+    if ((await steps.getInputValue(element, QUIZ)) === value) return;
+  }
+  // Final gate: throws with a clear value-mismatch if every attempt was lost.
+  await steps.verifyInputValue(element, QUIZ, value);
+}
+
+/**
+ * Selects a single-select answer, then advances.
  *
  * The label click is occasionally lost: the questionnaire re-renders each step
  * as it validates, and a click landing during that swap never reaches the
- * input, leaving `Next` disabled until the test times out. Observed as an
- * intermittent 30s failure on the full signup run.
+ * input, leaving `Next` disabled. A single re-click closed most of that, but
+ * not all — under heavy re-render both the first click and a lone retry can be
+ * swallowed, and the step then times out at 30s.
  *
- * Rather than retrying the whole test, the selection is re-asserted once if it
- * did not take. If the answer registered the first time — the normal case —
- * this costs one attribute read.
+ * So the option is clicked in a bounded loop until `Next` actually enables.
+ * These are radio options, so re-clicking a selection that already landed is
+ * idempotent — no risk of toggling it off. In the normal case the first click
+ * takes and the loop exits after one cheap attribute poll. `clickNextWhenEnabled`
+ * is the final gate: if every attempt was somehow lost it throws with a clear
+ * enabled-state failure rather than a mystery timeout.
  */
 async function selectAnswerAndAdvance(steps: Steps, option: string): Promise<void> {
-  await steps.click(option, QUIZ);
-
-  if (!(await nextBecomesEnabled(steps))) {
+  for (let attempt = 0; attempt < 4; attempt++) {
     await steps.click(option, QUIZ);
+    if (await nextBecomesEnabled(steps)) break;
   }
 
   await clickNextWhenEnabled(steps);
@@ -86,38 +107,37 @@ async function selectAnswerAndAdvance(steps: Steps, option: string): Promise<voi
  * the order below is load-bearing rather than cosmetic.
  */
 export async function completeQuestionnaire(steps: Steps, user: TestUser): Promise<void> {
-  // Step 1 — business details.
+  // Step 1 — business details. Both fills are re-applied until they stick (a
+  // fill can be lost to the step re-render just like a label click), so a
+  // dropped value becomes a re-fill rather than a 30s mystery timeout.
   await steps.verifyPresence('businessName', QUIZ);
-  await steps.fill('businessName', QUIZ, user.businessName);
-  await steps.fill('numberOfEmployees', QUIZ, user.employeeCount);
-  // Confirm both values actually landed — a fill lost to the same re-render
-  // race leaves Next disabled and produces a 30s timeout that reads as a
-  // mystery rather than as "the field was empty".
-  await steps.verifyInputValue('businessName', QUIZ, user.businessName);
-  await steps.verifyInputValue('numberOfEmployees', QUIZ, user.employeeCount);
+  await fillUntilValue(steps, 'businessName', user.businessName);
+  await fillUntilValue(steps, 'numberOfEmployees', user.employeeCount);
   await clickNextWhenEnabled(steps);
 
   // Step 2 — business type reveals industry, which reveals role. Subject to
-  // the same re-render race documented on selectAnswerAndAdvance below: any
-  // of the three reveals can have its click land mid re-render and get lost,
-  // leaving Next disabled. Re-assert all three once before giving up.
-  await steps.click('businessTypeOption', QUIZ);
-  await steps.click('industryOption', QUIZ);
-  await steps.click('buyerRoleOption', QUIZ);
-  if (!(await nextBecomesEnabled(steps))) {
+  // the same re-render race as selectAnswerAndAdvance below: any of the three
+  // reveals can have its click land mid re-render and get lost, leaving Next
+  // disabled. Re-assert the whole chain in a bounded loop until Next enables —
+  // re-clicking radios that already landed is idempotent, so repeating the
+  // chain only fills in whichever click was dropped.
+  for (let attempt = 0; attempt < 4; attempt++) {
     await steps.click('businessTypeOption', QUIZ);
     await steps.click('industryOption', QUIZ);
     await steps.click('buyerRoleOption', QUIZ);
+    if (await nextBecomesEnabled(steps)) break;
   }
   await clickNextWhenEnabled(steps);
 
-  // Step 3 — needs (multi-select). Same lost-click race, but the re-assert
-  // has to be state-aware: these are checkboxes, so blindly clicking again
-  // would UNCHECK a selection that did land and make things worse. Only
-  // re-click when nothing at all is checked.
+  // Step 3 — needs (multi-select). Same lost-click race, but the retry has to
+  // be state-aware: these are checkboxes, so re-clicking a box that already
+  // landed would UNCHECK it. `Next` only needs one selection, so the loop
+  // re-clicks a single option and only while nothing at all is checked —
+  // never toggling off a selection that did register.
   await steps.click('needSchedulingOption', QUIZ);
   await steps.click('needTimeTrackingOption', QUIZ);
-  if (!(await nextBecomesEnabled(steps))) {
+  for (let attempt = 0; attempt < 4; attempt++) {
+    if (await nextBecomesEnabled(steps)) break;
     if ((await steps.getCount('needsCheckedOption', QUIZ)) === 0) {
       await steps.click('needSchedulingOption', QUIZ);
     }
@@ -135,7 +155,15 @@ export async function completeQuestionnaire(steps: Steps, user: TestUser): Promi
     await selectAnswerAndAdvance(steps, option);
   }
 
-  await steps.waitForUrl(UrlPattern.ONBOARDING, undefined, { timeout: 30000 });
+  // The last step's Next is not a client-side route change — it fires the
+  // account-creating POST /api/signup, the single heaviest call in the flow,
+  // and the redirect to /onboarding only happens once the backend responds.
+  // A 30s budget was occasionally too tight for that round-trip on this shared
+  // demo environment (which is documented to return intermittent 502/504s —
+  // see adversarial-findings.md j-login-03). A true gateway failure is left to
+  // Playwright's configured retries; this wider budget only covers a slow-but-
+  // successful submission, without masking a genuine failure.
+  await steps.waitForUrl(UrlPattern.ONBOARDING, undefined, { timeout: 60000 });
 }
 
 /**

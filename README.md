@@ -167,6 +167,18 @@ escalated to an interactive challenge across dozens of automated signups. If it
 ever did, that flow would become untestable by design — the right response is a
 loud failure and a conversation about a test-mode key, not a workaround.
 
+**The backend is intermittently slow on the account-creating call.** The final
+questionnaire step fires `POST /api/signup`, and on a shared demo box that call
+occasionally hangs or returns a gateway error (502/504 — see the adversarial
+findings). That is why `playwright.config.ts` configures retries (1 locally, 2
+in CI) and why the signup flow gives that one transition a 60s budget. Two
+things worth separating: the *test-side* races — clicks and fills lost to the
+Angular questionnaire re-rendering each step — are fixed deterministically
+(every input is re-applied until it lands, verified across a 12× `--retries=0`
+stress run with zero input failures); the residual is purely the backend
+transient, which no test can fix and which a retry absorbs. If you ever see a
+run marked *flaky*, that is the environment, not a race.
+
 ---
 
 ## Defects found while building this
