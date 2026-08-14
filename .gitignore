@@ -1,5 +1,7 @@
 node_modules/
 .env
+.env.local
+.env.*.local
 
 # Internal process notes (design spec, implementation plan) — local only.
 /docs/
