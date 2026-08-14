@@ -18,6 +18,7 @@ converts Playwright's WebM output to MP4, and writes the results here.
 | `01-router-blank-page.mp4` / `.png` | An unrecognised `(modal:…)` auxiliary route raises Angular `NG04002`, collapses the URL to `/`, and renders an empty document. The recording is short because the failure is immediate — the screenshot is the whole story: a blank white page. | `router-malformed-modal.spec.ts` |
 | `02-duplicate-email-no-conflict-message.mp4` / `.png` | Registering with an email that already has an account is accepted with no conflict message; the recording shows the full registration submit and the questionnaire opening as though it succeeded. | `signup-duplicate-email.spec.ts` |
 | `03-duplicate-email-password-rejected.mp4` / `.png` | The same duplicate registration, followed by a login attempt with the password just chosen — rejected with "Unable to log you in with the supplied credentials". | `signup-duplicate-email.spec.ts` |
+| `04-employee-count-accepts-invalid.mp4` / `.png` | The "Number of employees" field accepts `3.33` (and, in the second test, an unbounded integer) and `Next` stays enabled — the client gate ignores the field's own `type="number" step="1"` validity. From the Phase-6 adversarial pass; see [`../tests/e2e/docs/adversarial-findings.md`](../tests/e2e/docs/adversarial-findings.md). | `signup-employee-count.spec.ts` |
 
 The videos record the browser viewport at 1280×720 for the whole test, so each
 one shows the complete reproduction from first navigation to the failing

@@ -18,6 +18,9 @@ const NAMES = [
   [/router-malformed-modal/, '01-router-blank-page'],
   [/surfaces-a-conflict-message/, '02-duplicate-email-no-conflict-message'],
   [/registration-works-at-login/, '03-duplicate-email-password-rejected'],
+  // Both employee-count cases (decimal, unbounded) demonstrate the one defect
+  // and truncate to the same Playwright dir slug — one evidence pair suffices.
+  [/signup-employee-count/, '04-employee-count-accepts-invalid'],
 ];
 
 function evidenceName(dir) {

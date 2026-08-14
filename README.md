@@ -72,7 +72,7 @@ The suite runs identically either way. CI uses `--ignore-scripts`.
 ## What is covered
 
 23 passing tests across three Playwright projects (`setup`, `chromium`,
-`mobile`), plus 3 that fail on purpose against confirmed defects. Each one is
+`mobile`), plus 5 that fail on purpose against confirmed defects. Each one is
 here because it covers a distinct way the flow can break, not to inflate a
 count.
 
@@ -238,8 +238,10 @@ To run without them:
 npm run test:no-defects        # or: npx playwright test --grep-invert @known-defect
 ```
 
-Expected results today: **23 passed, 3 failed** on a full run; **23 passed** with
-the known-defect tests excluded.
+Expected results today: **23 passed, 5 failed** on a full run — the 5 failures
+are all `@known-defect` (these two duplicate-email tests, the router blank-page
+test, and the two employee-count tests from the adversarial pass below);
+**23 passed** with the known-defect tests excluded.
 
 One implementation note, since the first version of this test got it wrong:
 it asserts that a conflict message *is present*, not that the questionnaire
