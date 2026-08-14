@@ -100,9 +100,13 @@ there is no data-integrity fallout — an error-handling gap only.
 
 - **Reproduced:** 2 identical reproductions; narrowed to the missing
   questionnaire fields specifically.
-- **Not automated:** reachable only by bypassing the UI with a hand-built
-  partial payload — no real user hits it, and a test would hardcode a
-  malformed-payload shape coupled to the API internals.
+- **Automated:** `tests/e2e/signup-api-contract.spec.ts` (`@known-defect`).
+  It sends a deliberately-incomplete `POST /api/signup` and asserts a
+  structured error rather than a raw 500. Live probing during authoring showed
+  the 500 reproduces *without* the `x-anonymous-id` header or a reCAPTCHA
+  token, so both were dropped — the test fails deterministically on the
+  assertion (5/5 runs) with no third-party handshake to flake on, and creates
+  no account (the crash precedes account creation).
 
 ## j-login
 
@@ -162,9 +166,10 @@ retry when retrying will keep failing for up to an hour.
 ## Pass summary
 
 Probed: 2 journeys. Findings surviving adversarial refutation: 8 (2 high, 4
-medium, 2 low). Refuted: 0. Automated as regression tests: 1
-(`signup-employee-count.spec.ts`, two `@known-defect` cases). Documented-not-
-automated: 7, each with the reason above.
+medium, 2 low). Refuted: 0. Automated as regression tests: 2 —
+`signup-employee-count.spec.ts` (two `@known-defect` cases) and
+`signup-api-contract.spec.ts` (the raw-500). Documented-not-automated: 6, each
+with the reason above.
 
 **Evidence** (throwaway accounts only, no real credentials):
 `tests/e2e/docs/screenshots/` — screenshots and raw timing/rate-limit data per
