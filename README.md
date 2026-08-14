@@ -25,7 +25,7 @@ That is the whole setup. **No `.env` is required** — verified by cloning this
 repository fresh and running it with no configuration at all.
 
 **A heads-up on the result before you run it:** `npm test` ends **23 passed,
-6 failed**, and the 6 failures are *intentional*. They are tagged
+5 failed**, and the 5 failures are *intentional*. They are tagged
 `@known-defect` and they document real bugs found in the product — each
 describes the behaviour the app *should* have, so it fails today and becomes a
 regression guard the day the bug is fixed. This is a deliberate choice, not a
