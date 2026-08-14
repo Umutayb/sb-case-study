@@ -13,6 +13,27 @@ gateway error, a destructive rate-limit probe, or an exploit that should not
 be replayed against a shared environment on every CI run are not things a
 durable suite should contain.
 
+## How these were verified
+
+Two independent stages, so no finding rests on a single agent's word:
+
+1. **Probe.** One adversarial pass per journey drove genuinely new ground —
+   API-level gate bypass, injection, boundary values, rate limiting, timing —
+   and reproduced each suspected defect at least twice before recording it.
+2. **Refute.** Every finding was then handed to a *separate* verifier whose
+   only instruction was to kill it: reproduce it independently, or show it is
+   a known item re-dressed, expected behaviour, a sandbox artifact, or
+   unreachable by a real user. Verifiers were told to default to "refuted"
+   when uncertain, on the principle that a false finding in a report to an
+   employer is worse than a missed one.
+
+Of the 8 findings that reached the refute stage, **0 were refuted** and **3
+had their severity corrected** by the verifier (critical→high on the Terms/DPA
+bypass, high→medium on the gateway-error message, medium→low on the missing
+Back button). The corrections are the audit trail: a rubber-stamp does not
+downgrade its own inputs. The per-finding **Verifier note** lines below record
+how each was independently reproduced.
+
 ## j-signup-onboard
 
 ### j-signup-onboard-01 — Terms/DPA acceptance is enforced only client-side [high]
