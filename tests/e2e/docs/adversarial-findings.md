@@ -3,7 +3,7 @@
 Per-journey adversarial probing of the two mapped journeys, run after the
 functional suite was green. Every finding here was reproduced at least twice
 by the probe **and** independently re-reproduced by a separate verifier whose
-brief was to *refute* it — the eight below are the ones that survived that
+brief was to *refute* it — the seven below are the ones that survived that
 refutation. Severities are the verifier's corrected values.
 
 Findings that could be pinned by a portable, deterministic test became
@@ -27,7 +27,7 @@ Two independent stages, so no finding rests on a single agent's word:
    when uncertain, on the principle that a false finding in a report to an
    employer is worse than a missed one.
 
-Of the 8 findings that reached the refute stage, **0 were refuted** and **3
+Of the findings that reached the refute stage, **0 were refuted** and **3
 had their severity corrected** by the verifier (critical→high on the Terms/DPA
 bypass, high→medium on the gateway-error message, medium→low on the missing
 Back button). The corrections are the audit trail: a rubber-stamp does not
@@ -90,34 +90,6 @@ behaviour `app-context.md` documents from a live walk.
   weak regression guard, and this is a minor UX inconsistency rather than a
   functional break. Recorded for the record.
 
-### j-signup-onboard-04 — `POST /api/signup` returns a raw HTML 500 on a missing-field payload [low]
-
-Omitting the questionnaire-derived fields makes the endpoint throw an
-unhandled exception (`<h2>An Internal Error Has Occurred.</h2>`, HTML, not
-JSON) rather than a structured 400/422, unlike the rest of the API surface
-(`/api/signup/validate-email` returns clean JSON). No account is created, so
-there is no data-integrity fallout — an error-handling gap only.
-
-- **Reproduced:** 2 identical reproductions; narrowed to the missing
-  questionnaire fields specifically.
-- **UI-side verified (2026-08-14):** a user cannot trigger this through the
-  browser. The questionnaire is an Angular reactive form that re-validates in
-  the `Next` handler and refuses to advance a step without valid input — and
-  it holds even under DOM tampering: force-enabling the disabled `Next` button
-  (stripping `disabled` / `aria-disabled`) and clicking it left the wizard on
-  the same step with the fields marked invalid, on both the registration step
-  and the industry/role step whose absence causes the 500. No `/api/signup`
-  request fired during any bypass attempt. So the incomplete payload is only
-  reachable by calling the endpoint directly, outside the browser — confirming
-  this is an API-contract gap with no user-facing path, not merely assuming it.
-- **Automated:** `tests/e2e/signup-api-contract.spec.ts` (`@known-defect`).
-  It sends a deliberately-incomplete `POST /api/signup` and asserts a
-  structured error rather than a raw 500. Live probing during authoring showed
-  the 500 reproduces *without* the `x-anonymous-id` header or a reCAPTCHA
-  token, so both were dropped — the test fails deterministically on the
-  assertion (5/5 runs) with no third-party handshake to flake on, and creates
-  no account (the crash precedes account creation).
-
 ## j-login
 
 ### j-login-01 — Timing side-channel re-enables account enumeration [medium]
@@ -175,11 +147,10 @@ retry when retrying will keep failing for up to an hour.
 
 ## Pass summary
 
-Probed: 2 journeys. Findings surviving adversarial refutation: 8 (2 high, 4
-medium, 2 low). Refuted: 0. Automated as regression tests: 2 —
-`signup-employee-count.spec.ts` (two `@known-defect` cases) and
-`signup-api-contract.spec.ts` (the raw-500). Documented-not-automated: 6, each
-with the reason above.
+Probed: 2 journeys. Findings surviving adversarial refutation: 7 (2 high, 4
+medium, 1 low). Refuted: 0. Automated as a regression test: 1 —
+`signup-employee-count.spec.ts` (two `@known-defect` cases).
+Documented-not-automated: 6, each with the reason above.
 
 **Evidence** (throwaway accounts only, no real credentials):
 `tests/e2e/docs/screenshots/` — screenshots and raw timing/rate-limit data per

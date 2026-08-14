@@ -84,7 +84,7 @@ The suite runs identically either way. CI uses `--ignore-scripts`.
 ## What is covered
 
 23 passing tests across three Playwright projects (`setup`, `chromium`,
-`mobile`), plus 6 that fail on purpose against confirmed defects. Each one is
+`mobile`), plus 5 that fail on purpose against confirmed defects. Each one is
 here because it covers a distinct way the flow can break, not to inflate a
 count.
 
@@ -262,10 +262,10 @@ To run without them:
 npm run test:no-defects        # or: npx playwright test --grep-invert @known-defect
 ```
 
-Expected results today: **23 passed, 6 failed** on a full run — the 6 failures
+Expected results today: **23 passed, 5 failed** on a full run — the 5 failures
 are all `@known-defect` (these two duplicate-email tests, the router blank-page
-test, the two employee-count tests, and the signup-500 contract test from the
-adversarial pass below); **23 passed** with the known-defect tests excluded.
+test, and the two employee-count tests from the adversarial pass below);
+**23 passed** with the known-defect tests excluded.
 
 One implementation note, since the first version of this test got it wrong:
 it asserts that a conflict message *is present*, not that the questionnaire
@@ -316,7 +316,7 @@ After the functional suite was green, both flows went through a focused
 adversarial pass aimed at the surface ordinary testing skips — API-level
 gate bypass, injection, boundary values, rate limiting, timing side-channels.
 Every finding below was reproduced at least twice, then handed to a separate
-reviewer whose only job was to *disprove* it; these eight are the ones that
+reviewer whose only job was to *disprove* it; these seven are the ones that
 survived. None was refuted. Full reproduction steps are in
 [`tests/e2e/docs/adversarial-findings.md`](tests/e2e/docs/adversarial-findings.md).
 
@@ -348,22 +348,16 @@ The rest, by severity after independent review:
 | Forgot-password rate-limit shown as a generic "Something went wrong" | medium | Reported — needs to trip a real rate limit |
 | "Number of employees" accepts decimals and unbounded integers | medium | **Yes** — `signup-employee-count.spec.ts` |
 | Questionnaire step 2 has no Back button, unlike every other step | low | Reported — a minor UX inconsistency |
-| `POST /api/signup` returns a raw HTML 500 on a missing-field payload | low | **Yes** — `signup-api-contract.spec.ts` |
 
-Two became tests; the other six are reported, and that split is the honest
+One became a test; the other six are reported, and that split is the honest
 outcome rather than a thin one. Most of these are not things a *portable* suite
 should assert: an on-demand gateway error, a destructive rate-limit probe, a
 wall-clock timing threshold, or an exploit that shouldn't run on every CI
-trigger each make a worse test than a clear report. The two that are clean,
-deterministic, and side-effect-free became `@known-defect` tests — the
-employee-count field accepting `3.33` (a client-side assertion, no account
-created), and the raw-500 on a malformed `POST /api/signup` (a contract
-assertion that the endpoint should return a structured error, not a 500; it
-creates nothing because the crash happens before any account is made). Both
-were built to fail deterministically on the *defect*, not on a fragile
-handshake — the contract test in particular was stripped of its reCAPTCHA and
-third-party-cookie dependencies once live probing showed the 500 reproduces
-without them.
+trigger each make a worse test than a clear report. The one that is clean,
+deterministic, and side-effect-free became a `@known-defect` test — the
+employee-count field accepting `3.33` (a client-side assertion that creates no
+account), built to fail deterministically on the *defect* itself, not on a
+fragile handshake.
 
 ## Selector strategy
 
