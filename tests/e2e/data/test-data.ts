@@ -11,6 +11,56 @@ export class Routes {
   static readonly FORGOT_PASSWORD = '/login/forgot';
   static readonly LOGOUT = '/logout';
   static readonly DASHBOARD = '/dashboard/my-overview';
+  static readonly ONBOARDING = '/onboarding';
+
+  /**
+   * The schedule route the checklist's "Add your first shift" task hands off
+   * to. The `;onboardingStep=` segment is an Angular matrix parameter, not a
+   * query string — it is what makes the page open its guided add-a-shift
+   * tour rather than the plain week view.
+   */
+  static readonly SCHEDULE_ADD_SHIFT =
+    '/schedule/employee/week;onboardingStep=SCHEDULE_SHIFT';
+
+  /** The same schedule view without the guided-onboarding matrix parameter. */
+  static readonly SCHEDULE_WEEK = '/schedule/employee/week';
+}
+
+/**
+ * The guided checklist's seven tasks, in the order the product renders them.
+ * Kept here rather than inline so the order assertion and the per-task
+ * lookups cannot drift apart.
+ */
+export class ChecklistTasks {
+  static readonly ACCOUNT_CREATED = '1. Account created';
+  static readonly FIRST_SHIFT = '2. Add your first shift';
+  static readonly OPTIMISE_SCHEDULE = '3. Optimise your schedule';
+  static readonly TRACK_HOURS = '4. Track employee hours';
+  static readonly MANAGE_ABSENCES = '5. Manage employee absences';
+  static readonly INVITE_TEAM = '6. Invite your team';
+  static readonly MOBILE_APP = '7. Download mobile app';
+
+  static readonly ALL = [
+    ChecklistTasks.ACCOUNT_CREATED,
+    ChecklistTasks.FIRST_SHIFT,
+    ChecklistTasks.OPTIMISE_SCHEDULE,
+    ChecklistTasks.TRACK_HOURS,
+    ChecklistTasks.MANAGE_ABSENCES,
+    ChecklistTasks.INVITE_TEAM,
+    ChecklistTasks.MOBILE_APP,
+  ];
+
+  /**
+   * A brand-new account has exactly one of the seven done, so the progress
+   * readout is `14%`. Asserted as a literal because it is the product's own
+   * rounding of 1/7 — deriving it here would just re-implement the bug we
+   * would want a regression to catch.
+   */
+  static readonly PROGRESS_FRESH = '14%';
+  /** Two of seven — what completing one more task moves the readout to. */
+  static readonly PROGRESS_TWO_DONE = '28%';
+  /** Three of seven. */
+  static readonly PROGRESS_THREE_DONE = '42%';
 }
 
 /**
@@ -39,6 +89,13 @@ export class UrlPattern {
 
   /** Where the login flow finishes — no first-run modal on a returning user. */
   static readonly DASHBOARD_AFTER_LOGIN = /\/dashboard\/my-overview(?:\?.*)?$/;
+
+  /**
+   * The schedule view reached from the checklist's "Add your first shift"
+   * task. Matched on the matrix parameter rather than the whole path because
+   * the week segment carries a date that changes every run.
+   */
+  static readonly SCHEDULE_ADD_SHIFT = /\/schedule\/employee\/week;onboardingStep=SCHEDULE_SHIFT/;
 }
 
 export interface TestUser {

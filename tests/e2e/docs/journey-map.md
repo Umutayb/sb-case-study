@@ -77,7 +77,7 @@ Total: 27 in-app routes discovered. Gated: 0 (signup is open; no admin/paid-tier
 9. Step 6 (multi-select despite reading like a single-select step): "What's this problem costing you right now?"
 10. Step 7 (single-select): "What's the main reason you're looking for a solution right now?"
 11. Step 8 (single-select): "When would you like this sorted out?" → submits the questionnaire → redirects to `/onboarding`
-12. OnboardingPage teams step (pre-filled with generic defaults tied to the selected business type, not the business name) → Next/Skip
+12. OnboardingPage teams step (one row, pre-filled with the business name given to the questionnaire) → Next/Skip
 13. Add-employees step → Next/Skip
 14. Shift-templates step → Next/Skip
 15. Completion screen ("You're all set, `<first name>`!") → click "See Shiftbase in action!" → redirects to `/dashboard/my-overview` (aux modal segment)
@@ -159,12 +159,91 @@ Total: 27 in-app routes discovered. Gated: 0 (signup is open; no admin/paid-tier
   - Performance baseline: **gap** — not yet established.
 **UI-covers:** login, mfa-promote-decline
 
+### j-onboarding-wizard: The post-registration setup wizard on its own terms
+**Priority:** P1
+**Risk factors:** input-heavy, mutating, high-state-variation
+**Category:** Conversion
+**Entry:** `/onboarding` (authenticated; reached from the questionnaire, or by direct navigation at any later point)
+**Pages touched:** /onboarding
+**Sub-journey refs:** —
+**Scope note:** carved out of `j-signup-onboard` at the user's request on 2026-08-18 ("do we have a test case going through the onboarding task list after sign up?" → "branch off, build these tests"). The parent journey walks the wizard blind on its way to the dashboard; this journey is about the wizard itself.
+**Steps:**
+1. Arrive at `/onboarding` → OnboardingPage, teams step
+2. Teams step — one row pre-filled with the business name; `Add team` appends an empty row; each row past the first gets an enabled delete control → Next/Skip
+3. Employees step — one row pre-filled with the registering user's first/last name plus a `Team` `<select>` listing the teams from step 2; `Add employee` appends a row → Next/Skip
+4. Shift-templates step — one row pre-filled `Day shift` / `09:00` / `17:30`; `Add Shift template` appends a row → Next/Skip
+5. Completion screen ("🎉 You're all set, `<first name>`!") → "See Shiftbase in action!" → `/dashboard/my-overview(modal:…)`
+**Branches:**
+- Skip and Next both advance; skipping all three steps still reaches the completion screen.
+- No completion gate and no memory: re-entering `/onboarding` on an account that already finished restarts at the teams step with the same pre-filled business name, and abandoning the wizard mid-way leaves `/dashboard/my-overview` reachable.
+- Finishing the wizard lands on the `(modal:highlights)` auxiliary route **even in a session that started at `/login`** — the first-run modal hangs off completing onboarding, not off having just signed up.
+**State variations:**
+- The progress bar is shared with the signup questionnaire, so it reports position in the whole registration journey rather than in the wizard — `aria-valuenow` 83.33 on the employees step, 91.67 on the shift-templates step. No progress bar on the completion screen.
+- Teams named in step 2 are the exact option list of step 3's `Team` select — the wizard's one observable cross-step effect.
+**Exit:** completion screen reached, or the wizard abandoned with the dashboard still reachable.
+**Test expectations:**
+- P1: full journey test + Error state for every failure branch + Edge case + Mobile (with rationale)
+  - Full journey test: **covered** — `onboarding/wizard.spec.ts` › `ONB-01`.
+  - Cross-step data flow (team → employee select): **covered** — `ONB-02`.
+  - Branch — skip every step: **covered** — `ONB-03`.
+  - Branch — no memory on re-entry: **covered** — `ONB-04`.
+  - Branch — no completion gate: **covered** — `ONB-05`.
+  - Error state: **none to cover** — the wizard has no validation. Every field arrives pre-filled and both controls advance unconditionally; there is no input it rejects. Recorded as "no failure branch exists" rather than as a gap.
+  - Edge case — an emptied team name, or a team row deleted down to zero: **gap**.
+  - Mobile: no — the wizard is three pre-filled rows and a Next button, with no layout risk the registration form's `@mobile` check does not already cover.
+  - Performance baseline: **gap** — not established (out of scope for a functional brief).
+**UI-covers:** onboarding-wizard
+
+### j-guided-checklist: The "Get started" checklist and its tasks
+**Priority:** P1
+**Risk factors:** mutating, high-state-variation, prior-defect-history
+**Category:** Conversion
+**Entry:** `/dashboard/my-overview` (authenticated, checklist not yet dismissed)
+**Pages touched:** /dashboard/my-overview, /schedule/employee/week
+**Sub-journey refs:** [sj-dash-landing]
+**Scope note:** the brief's dashboard cutoff put "guided checklist" out of scope; the user reopened it explicitly on 2026-08-18 ("for the checklist take the actual actions that involve advanced interactions such as dragging and dropping. implement all!"). Recorded here as an authorised scope extension, not as a silently widened brief.
+**Steps:**
+1. Land on `/dashboard/my-overview` with the checklist not yet dismissed → `my-checklist-widget` renders seven tasks, task 1 (`Account created`) already done, progress `14%`
+2. Expand a task → its one-line description and `Start` (tasks 3–5 also offer `Show me`)
+3. Press `Start` → the task's own flow opens
+4. Complete a task → its icon flips to `check-circle-solid` and the progress readout rises
+5. `Dismiss checklist` → the widget and the sidebar entry both go, permanently for that account
+**Branches (per task, as observed):**
+- **2. Add your first shift** → routes to `/schedule/employee/week;onboardingStep=SCHEDULE_SHIFT` and opens a guided tour ("Let's do it!" → a coach mark asking for a drag). Dragging the `Day shift` template from the left panel onto an employee's day **completes the task**. Order-sensitive: accepting the tour splash before clearing coach marks is what keeps the onboarding context alive through the drop — clear first and the shift lands but the checklist ignores it.
+- **3. Optimise your schedule** → `Start quick setup` enables availability management, open shifts and shift exchange, and says so in a confirmation. Does **not** tick the task.
+- **4. Track employee hours** → `Start quick setup` opens a five-step `time-tracking-dialog`; `Next` is disabled until a tracking method is chosen. Does not tick the task while the wizard is unfinished.
+- **5. Manage employee absences** → `Show me a quick tour` starts a product tour behind a "You are viewing a product tour" banner. **Completes the task**, even when the tour is skipped rather than watched.
+- **6. Invite your team** → **known defect**: `invite-employees-dialog` mounts with zero children and a 750 × 2 px dialog box. Reproduced 3×. Covered (failing on purpose) by `checklist-tasks.spec.ts` › `TSK-06` (`@known-defect`); see `adversarial-findings.md` › `j-guided-checklist-01`.
+- **7. Download mobile app** → a `Done!` button. **Completes the task**.
+**State variations:**
+- The same state renders twice: `my-checklist-widget` on the dashboard and `checklist-panel` behind a sidebar "Get started" entry. The sidebar entry belongs to a navigation variant that was observed appearing and then disappearing for the same account mid-session — the widget was present on every visit, so it is the surface the tests target.
+- One task expands at a time; opening another collapses the current one, and clicking the open task does not close it.
+- Coach-mark popovers (`sb-popover` in a `cdk-overlay-pane`) render over both the checklist and the schedule grid and swallow clicks aimed underneath. They chain, and the schedule's walkthrough runs several steps deep.
+- Progress and dismissal are account state, not session state: both survive a reload and a fresh login.
+**Exit:** the checklist reflects the work done, or is dismissed.
+**Test expectations:**
+- P1: full journey test + Error state for every failure branch + Edge case + Mobile (with rationale)
+  - Initial state (seven tasks in order, one done, `14%`): **covered** — `onboarding/checklist.spec.ts` › `CHK-01`.
+  - Accordion behaviour: **covered** — `CHK-02`.
+  - Completing a task moves the readout, and it persists: **covered** — `CHK-03`.
+  - Dismissal is permanent: **covered** — `CHK-04`.
+  - Task 2 via drag and drop: **covered** — `checklist-tasks.spec.ts` › `TSK-01`.
+  - Tasks 3 and 4 hand off to their setup flows: **covered** — `TSK-02`, `TSK-03`. Asserted at the handoff on purpose: walking the five-step time-tracking configuration to its end is testing time tracking, not the checklist.
+  - Task 5 via the absence tour: **covered** — `TSK-04`.
+  - Guard — opening a task does not tick it: **covered** — `TSK-05`.
+  - Error state — task 6's empty dialog (defect): **covered**, failing on purpose — `TSK-06`.
+  - Edge case — the `checklist-panel` side surface: **gap**, deliberately. It is reachable only through a navigation variant that comes and goes, so a spec for it would be flaky through no fault of the test.
+  - Edge case — a checklist at 7/7: **gap**. Reaching it needs the time-tracking and scheduling flows completed in full, which is a different journey's worth of work.
+  - Mobile: no — the checklist is a read-and-click list; the drag in `TSK-01` has no touch equivalent mapped yet.
+  - Performance baseline: **gap** — not established.
+**UI-covers:** guided-checklist, schedule-shift-drag
+
 ## Section → Journey Map
 
 | Section ID (canonical) | Journeys covering it | Notes |
 |---|---|---|
-| `auth` | j-signup-onboard, j-login | Covers `/signup`, `/onboarding`, `/login`, `/login/mfa-promote`, `/login/mfa-setup` — the full pre-dashboard surface of both named flows. `/login/forgot` and `/logout` are also `auth`-classified routes but sit outside the two named flows — see `## Out of Scope`. |
-| `dashboard` | j-signup-onboard, j-login (via sj-dash-landing) | In scope: the landing surface only (`/dashboard/my-overview`) as each journey's Exit. Everything else discovered under `dashboard` (sub-pages, guided checklist, widget customisation, feedback survey, account-menu chrome, email-verification banner) is past the landing point and out of scope per the brief. |
+| `auth` | j-signup-onboard, j-onboarding-wizard, j-login | Covers `/signup`, `/onboarding`, `/login`, `/login/mfa-promote`, `/login/mfa-setup` — the full pre-dashboard surface of both named flows. `/login/forgot` and `/logout` are also `auth`-classified routes but sit outside the two named flows — see `## Out of Scope`. |
+| `dashboard` | j-signup-onboard, j-login (via sj-dash-landing), j-guided-checklist | In scope: the landing surface (`/dashboard/my-overview`) as each journey's Exit, plus the guided checklist — originally excluded by the brief's dashboard cutoff and reopened by explicit user request (see j-guided-checklist's Scope note). Still out of scope under `dashboard`: sub-pages, widget customisation, feedback survey, account-menu chrome, email-verification banner. |
 | `scheduling` *(novel)* | — (out of scope) | No canonical vocabulary entry fits a dedicated shift/roster-planning module; flagged by the discovery agent as a candidate new section, not normalised. Out of scope regardless — past the dashboard. |
 | `timesheet` *(novel)* | — (out of scope) | Team-wide time-tracking/approval module, distinct from the personal `/dashboard/my-hours` sub-page. No canonical fit. Out of scope — past the dashboard. |
 | `communications` *(novel)* | — (out of scope) | Team messaging/broadcast module with an unread-count badge; the discovery agent judged it distinct enough from `inbox` (personal messaging) or `notifications` (system alerts) to warrant its own id rather than forcing a fit. Out of scope — past the dashboard. |
@@ -201,11 +280,22 @@ None. Signup is open (`signup-open: true` in the discovery draft; no invite or a
 - Declined to create journeys for `/login/forgot` (password recovery) and `/logout` (session termination) — adjacent to the two named flows but not literally either one; recorded under `## Out of Scope` as flows outside the brief's named scope.
 - No variant collapses or further decompositions were needed beyond the above — with exactly two journeys, there was no redundant pair to merge.
 
+**Later revision — 2026-08-18, user-requested (two journeys added):**
+
+- Split `j-onboarding-wizard` out of `j-signup-onboard`. The parent treats `/onboarding` as three Next-or-Skip clicks between the questionnaire and the dashboard, which is right for a journey whose goal is "reach the dashboard" — but it means no test asserts which steps exist, what they pre-fill, or that data flows between them. Clears the ≥3-action bar on its own (teams → employees → templates → completion) and has a distinct goal (set the account up) from the parent's (get an account). The parent keeps `onboarding-wizard` in `UI-covers`; the two overlap by design, at different depths.
+- Added `j-guided-checklist`. Not a split — this surface had no journey at all, having been excluded by the brief's dashboard cutoff. Reopened by explicit user request; the Scope note on the block quotes the instruction.
+- Both are P1, not P0: neither blocks a user from reaching the product (the wizard skips wholesale, the checklist dismisses), which is what separates them from the two P0 conversion/auth journeys.
+- Declined to give the checklist's seven tasks their own journey blocks. Each is one `Start` press plus whatever the product area behind it does — under the ≥3-action bar, and they share one entry, one state model and one exit. They live as Branches with a `TSK-*` expectation each.
+
 ## Coverage Plan
+
+*(Written when the map held two journeys; the two P1 journeys added on 2026-08-18 arrived with their own tests, so the shape of the plan below still holds.)*
 
 This is a two-journey project whose suite is already substantially built (13 passing tests across `signup.spec.ts`, `login.spec.ts`, `login-negative.spec.ts`, `session.spec.ts`, plus 3 tests failing on purpose against confirmed defects in `signup-duplicate-email.spec.ts` and `router-malformed-modal.spec.ts`). Both P0 journeys already have a full entry-to-exit test and most of their error-state expectations covered. The remaining work is a short, targeted gap-closing pass, not a fresh five-pass programme.
 
 **P0 (2 journeys: j-signup-onboard, j-login) — both `risk: elevated`, so both dispatch before any lower tier and neither is eligible for grouped/batch dispatch.**
+
+**P1 (2 journeys: j-onboarding-wizard, j-guided-checklist) — both `risk: elevated` (3 risk factors each), added 2026-08-18 by user request and built in the same pass. Both are substantially covered on arrival; their open items are in the gap table below.**
 
 Remaining gaps, by journey (see each journey's `Test expectations` for detail):
 
@@ -216,6 +306,9 @@ Remaining gaps, by journey (see each journey's `Test expectations` for detail):
 | 3 | j-login | MFA-branch coverage: "Set up now" wrong-code alert (open), "Back to login" session-termination (closed by `login-session-edges.spec.ts`). "Don't ask again" persistence is documented under Branches but was never an authored `Test expectations` row — it is a candidate for a future pass, not an open gap against this map. | Compositional |
 | 4 | j-login | Adversarial edge cases: concurrent sessions, stale/cookie-invalidated session mid-interaction | Adversarial |
 | 5 | j-login | Mobile-viewport check for the login form, mirroring `signup.spec.ts`'s `@mobile` pattern | Compositional (small) |
+| 6 | j-onboarding-wizard | Edge case: an emptied team name, or a team row deleted down to zero — the wizard has no validation, so what it does with nothing is unknown | Adversarial |
+| 7 | j-guided-checklist | The `checklist-panel` side surface. Deliberately unbuilt: it is reachable only through a navigation variant observed appearing and disappearing for one account mid-session, so a spec would be flaky through no fault of the test. Revisit if the variant settles. | Compositional |
+| 8 | j-guided-checklist | A checklist at 7/7 — needs the scheduling and time-tracking flows driven to completion, which is a different journey's worth of work | Compositional (large) |
 | 6 | Both | Performance baseline (page-load / navigation timing on entry-to-exit) — not full k6 load testing, a lightweight UI-timing assertion per journey | Compositional (small) |
 
 **Estimated dispatch count:** ~5–6 targeted dispatches (one per gap cluster above; items 1+2 and 3+4 can each reasonably combine into one dispatch per journey). **Estimated wall-clock:** ~1.5–2 hours at the ~20 min/opus-dispatch heuristic (no prior per-subagent timing data exists yet for this project).

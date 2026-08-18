@@ -6,7 +6,9 @@ targeted runs, for referring to a scenario in a bug report or a review, and for
 pointing at a case without quoting its whole sentence.
 
 Prefixes: `SETUP` account resolution · `SGN` signup and onboarding
-(`j-signup-onboard`) · `LGN` login (`j-login`) · `SES` post-login session ·
+(`j-signup-onboard`) · `ONB` the `/onboarding` wizard (`j-onboarding-wizard`) ·
+`CHK` the guided checklist surface (`j-guided-checklist`) · `TSK` the guided
+checklist's tasks · `LGN` login (`j-login`) · `SES` post-login session ·
 `RTR` router edges.
 
 IDs are stable. A retired test keeps its ID retired rather than recycling it, so
@@ -53,6 +55,21 @@ Two things worth knowing:
 | `SGN-11` | `signup/signup-duplicate-email.spec.ts` | chromium | a password set during a duplicate registration works at login `@known-defect` |
 | `SGN-12` | `signup/signup-employee-count.spec.ts` | chromium | a decimal employee count does not block the Next button `@known-defect` |
 | `SGN-13` | `signup/signup-employee-count.spec.ts` | chromium | an unbounded employee count does not block the Next button `@known-defect` |
+| `ONB-01` | `onboarding/wizard.spec.ts` | chromium | the wizard walks teams, employees and shift templates to the completion screen |
+| `ONB-02` | `onboarding/wizard.spec.ts` | chromium | a team added in the teams step is selectable against an employee |
+| `ONB-03` | `onboarding/wizard.spec.ts` | chromium | skipping every step still reaches the completion screen |
+| `ONB-04` | `onboarding/wizard.spec.ts` | chromium | re-entering the wizard after finishing it starts over from the teams step |
+| `ONB-05` | `onboarding/wizard.spec.ts` | chromium | abandoning the wizard part-way still leaves the dashboard reachable |
+| `CHK-01` | `onboarding/checklist.spec.ts` | chromium | a new account lands with one of seven tasks done |
+| `CHK-02` | `onboarding/checklist.spec.ts` | chromium | expanding a task reveals its call to action and collapses the previous one |
+| `CHK-03` | `onboarding/checklist.spec.ts` | chromium | completing a task ticks it off and moves the progress readout |
+| `CHK-04` | `onboarding/checklist.spec.ts` | chromium | dismissing the checklist removes it for good |
+| `TSK-01` | `onboarding/checklist-tasks.spec.ts` | chromium | dragging a shift template onto the schedule completes "Add your first shift" |
+| `TSK-02` | `onboarding/checklist-tasks.spec.ts` | chromium | "Optimise your schedule" enables the scheduling defaults |
+| `TSK-03` | `onboarding/checklist-tasks.spec.ts` | chromium | "Track employee hours" opens the time-tracking setup and unblocks on a choice |
+| `TSK-04` | `onboarding/checklist-tasks.spec.ts` | chromium | taking the absence tour completes "Manage employee absences" |
+| `TSK-05` | `onboarding/checklist-tasks.spec.ts` | chromium | every task that stays incomplete keeps its call to action |
+| `TSK-06` | `onboarding/checklist-tasks.spec.ts` | chromium | "Invite your team" opens an invite dialog `@known-defect` |
 | `LGN-01` | `login/login.spec.ts` | chromium | valid credentials reach the dashboard |
 | `LGN-02` | `login/login.spec.ts` | chromium | login is offered multifactor authentication before the dashboard |
 | `LGN-03` | `login/login-negative.spec.ts` | chromium | submitting an empty form reports both required fields |

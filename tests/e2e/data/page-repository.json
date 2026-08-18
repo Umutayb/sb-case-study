@@ -225,6 +225,111 @@
               "flags": "i"
             }
           }
+        },
+        {
+          "elementName": "progressBar",
+          "selector": {
+            "role": "progressbar"
+          }
+        },
+        {
+          "elementName": "teamsHeading",
+          "selector": {
+            "role": "heading",
+            "name": {
+              "regex": "Organise your teams",
+              "flags": "i"
+            }
+          }
+        },
+        {
+          "elementName": "teamNameInput",
+          "selector": {
+            "css": "input[name='name']"
+          }
+        },
+        {
+          "elementName": "addTeamButton",
+          "selector": {
+            "role": "button",
+            "name": "Add team"
+          }
+        },
+        {
+          "elementName": "employeesHeading",
+          "selector": {
+            "role": "heading",
+            "name": {
+              "regex": "add your first employees",
+              "flags": "i"
+            }
+          }
+        },
+        {
+          "elementName": "employeeFirstName",
+          "selector": {
+            "css": "input[name='first_name']"
+          }
+        },
+        {
+          "elementName": "employeeLastName",
+          "selector": {
+            "css": "input[name='last_name']"
+          }
+        },
+        {
+          "elementName": "employeeTeamSelect",
+          "selector": {
+            "css": "select[name='Team']"
+          }
+        },
+        {
+          "elementName": "employeeTeamOption",
+          "selector": {
+            "css": "select[name='Team'] option"
+          }
+        },
+        {
+          "elementName": "addEmployeeButton",
+          "selector": {
+            "role": "button",
+            "name": "Add employee"
+          }
+        },
+        {
+          "elementName": "shiftTemplatesHeading",
+          "selector": {
+            "role": "heading",
+            "name": {
+              "regex": "Shift templates",
+              "flags": "i"
+            }
+          }
+        },
+        {
+          "elementName": "shiftTemplateName",
+          "selector": {
+            "css": "input[name='long_name']"
+          }
+        },
+        {
+          "elementName": "shiftTemplateStart",
+          "selector": {
+            "css": "input[name='starttime']"
+          }
+        },
+        {
+          "elementName": "shiftTemplateEnd",
+          "selector": {
+            "css": "input[name='endtime']"
+          }
+        },
+        {
+          "elementName": "addShiftTemplateButton",
+          "selector": {
+            "role": "button",
+            "name": "Add Shift template"
+          }
         }
       ]
     },
@@ -343,7 +448,10 @@
           "elementName": "homeNavLink",
           "selector": {
             "role": "link",
-            "name": { "regex": "^(Home|Dashboard)$", "flags": "i" }
+            "name": {
+              "regex": "^(Home|Dashboard)$",
+              "flags": "i"
+            }
           }
         },
         {
@@ -405,6 +513,274 @@
           "selector": {
             "role": "button",
             "name": "Add Worked Hours"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ChecklistPage",
+      "elements": [
+        {
+          "elementName": "widget",
+          "selector": {
+            "css": "my-checklist-widget"
+          }
+        },
+        {
+          "elementName": "widgetProgress",
+          "selector": {
+            "css": "my-checklist-widget [role='progressbar']"
+          }
+        },
+        {
+          "elementName": "widgetEncouragement",
+          "selector": {
+            "css": "my-checklist-widget sb-checklist-content > div p"
+          }
+        },
+        {
+          "elementName": "tasks",
+          "selector": {
+            "css": "my-checklist-widget sb-checklist-item"
+          }
+        },
+        {
+          "elementName": "taskHeader",
+          "selector": {
+            "css": "section > div"
+          }
+        },
+        {
+          "elementName": "taskTitle",
+          "selector": {
+            "css": "section > div > p"
+          }
+        },
+        {
+          "elementName": "taskDescription",
+          "selector": {
+            "css": "article p"
+          }
+        },
+        {
+          "elementName": "taskStartButton",
+          "selector": {
+            "css": "article button:has-text('Start')"
+          }
+        },
+        {
+          "elementName": "taskShowMeButton",
+          "selector": {
+            "css": "article button:has-text('Show me')"
+          }
+        },
+        {
+          "elementName": "completedTasks",
+          "selector": {
+            "css": "my-checklist-widget sb-checklist-item:has(sb-icon[aria-label='check-circle-solid'])"
+          }
+        },
+        {
+          "elementName": "expandedTasks",
+          "selector": {
+            "css": "my-checklist-widget sb-checklist-item[aria-expanded='true']"
+          }
+        },
+        {
+          "elementName": "dismissButton",
+          "selector": {
+            "css": "my-checklist-widget button:has-text('Dismiss checklist')"
+          }
+        },
+        {
+          "elementName": "sidebarEntry",
+          "selector": {
+            "css": "app-side-panel-trigger, li:has(> div > span:text-is('Get started'))"
+          }
+        },
+        {
+          "elementName": "panel",
+          "selector": {
+            "css": "checklist-panel"
+          }
+        },
+        {
+          "elementName": "panelHeading",
+          "selector": {
+            "role": "heading",
+            "name": "Get started"
+          }
+        },
+        {
+          "elementName": "panelTasks",
+          "selector": {
+            "css": "checklist-panel sb-checklist-item"
+          }
+        },
+        {
+          "elementName": "panelCloseButton",
+          "selector": {
+            "css": "checklist-panel button:has(.sr-only:text-is('Close')), checklist-panel button[aria-label='Close']"
+          }
+        }
+      ]
+    },
+    {
+      "name": "SchedulePage",
+      "elements": [
+        {
+          "elementName": "shiftsSidebar",
+          "selector": {
+            "css": "schedule-dynamic-sidebar-shifts"
+          }
+        },
+        {
+          "elementName": "shiftsSidebarToggle",
+          "selector": {
+            "css": "button[data-tracking-id='schedule-sidebar-toggle']"
+          }
+        },
+        {
+          "elementName": "shiftTemplateCard",
+          "selector": {
+            "css": "schedule-dynamic-sidebar-shifts div[dnd-free-draggable]"
+          }
+        },
+        {
+          "elementName": "dayDropZone",
+          "selector": {
+            "css": "n-period-employee-dropzone-day .day-drop-list"
+          }
+        },
+        {
+          "elementName": "scheduledShift",
+          "selector": {
+            "css": "schedule-shift-template"
+          }
+        },
+        {
+          "elementName": "tourStartButton",
+          "selector": {
+            "role": "button",
+            "name": {
+              "regex": "Let's do it",
+              "flags": "i"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ChecklistDialogPage",
+      "elements": [
+        {
+          "elementName": "dialog",
+          "selector": {
+            "css": "[role='dialog']"
+          }
+        },
+        {
+          "elementName": "closeButton",
+          "selector": {
+            "css": "[role='dialog'] button:has(.sr-only:text-is('Close')), [role='dialog'] button[aria-label='Close']"
+          }
+        },
+        {
+          "elementName": "startQuickSetupButton",
+          "selector": {
+            "role": "button",
+            "name": "Start quick setup"
+          }
+        },
+        {
+          "elementName": "showTourButton",
+          "selector": {
+            "role": "button",
+            "name": "Show me a quick tour"
+          }
+        },
+        {
+          "elementName": "doneButton",
+          "selector": {
+            "role": "button",
+            "name": "Done!"
+          }
+        },
+        {
+          "elementName": "schedulingDefaultsConfirmation",
+          "selector": {
+            "text": "We've enabled some smart scheduling defaults for you."
+          }
+        },
+        {
+          "elementName": "timeTrackingDialog",
+          "selector": {
+            "css": "time-tracking-dialog"
+          }
+        },
+        {
+          "elementName": "timeTrackingQuestion",
+          "selector": {
+            "text": "Which method of time tracking works best for your team?"
+          }
+        },
+        {
+          "elementName": "clockInOption",
+          "selector": {
+            "css": "time-tracking-dialog label:has-text('Allow employees to clock in and out')"
+          }
+        },
+        {
+          "elementName": "nextButton",
+          "selector": {
+            "role": "button",
+            "name": "Next"
+          }
+        },
+        {
+          "elementName": "inviteEmployeesDialog",
+          "selector": {
+            "css": "invite-employees-dialog"
+          }
+        },
+        {
+          "elementName": "productTourBanner",
+          "selector": {
+            "text": "You are viewing a product tour"
+          }
+        },
+        {
+          "elementName": "skipTourButton",
+          "selector": {
+            "role": "button",
+            "name": "Skip tour"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AppChromePage",
+      "elements": [
+        {
+          "elementName": "coachMarkPopover",
+          "selector": {
+            "css": ".cdk-overlay-pane sb-popover"
+          }
+        },
+        {
+          "elementName": "coachMarkGotItButton",
+          "selector": {
+            "role": "button",
+            "name": {
+              "regex": "^Got it!?$",
+              "flags": "i"
+            }
+          }
+        },
+        {
+          "elementName": "coachMarkActionButton",
+          "selector": {
+            "css": ".cdk-overlay-pane sb-popover button"
           }
         }
       ]

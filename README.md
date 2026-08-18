@@ -24,8 +24,8 @@ npm test
 That is the whole setup. **No `.env` is required** — verified by cloning this
 repository fresh and running it with no configuration at all.
 
-**A heads-up on the result before you run it:** `npm test` ends **23 passed,
-6 failed**, and the 6 failures are *intentional*. They are tagged
+**A heads-up on the result before you run it:** `npm test` ends **37 passed,
+7 failed**, and the 7 failures are *intentional*. They are tagged
 `@known-defect` and they document real bugs found in the product — each
 describes the behaviour the app *should* have, so it fails today and becomes a
 regression guard the day the bug is fixed. This is a deliberate choice, not a
@@ -33,7 +33,7 @@ broken suite (the reasoning is under "Defects found while building this" and
 "Adversarial findings" below). To run only the tests that should pass:
 
 ```bash
-npm run test:no-defects        # 23 passed, 0 failed
+npm run test:no-defects        # 37 passed, 0 failed
 ```
 
 `npm run test:report` opens the HTML report.
@@ -99,8 +99,8 @@ The suite runs identically either way. CI uses `--ignore-scripts`.
 
 ## What is covered
 
-23 passing tests across three Playwright projects (`setup`, `chromium`,
-`mobile`), plus 6 that fail on purpose against confirmed defects. Each one is
+37 passing tests across three Playwright projects (`setup`, `chromium`,
+`mobile`), plus 7 that fail on purpose against confirmed defects. Each one is
 here because it covers a distinct way the flow can break, not to inflate a
 count.
 
@@ -139,6 +139,42 @@ count.
 |---|---|
 | An authenticated session survives a reload | Token persistence — the top post-login regression. Asserts the dashboard still renders, not merely that the URL held. |
 | The dashboard exposes the primary navigation | A cheap structural check that the landing surface is actually the dashboard. |
+
+### The onboarding wizard, on its own terms
+
+The signup test walks `/onboarding` blind — Next-or-Skip until it is past. That
+is right for a test whose goal is "reach the dashboard", but it means nothing
+asserts what the wizard *is*. These do.
+
+| Scenario | What it protects |
+|---|---|
+| The wizard walks teams, employees and shift templates to the completion screen | Each step is the step it claims to be and arrives pre-filled as documented. Also pins the progress bar, which is shared with the signup questionnaire — if the wizard gains or loses a step without moving it, the two have come apart. |
+| A team added in the teams step is selectable against an employee | The wizard's one observable cross-step effect. Everything else in it is three independent forms. |
+| Skipping every step still reaches the completion screen | `Skip` is not a dead end — the whole wizard is optional. |
+| Re-entering after finishing starts over from the teams step | Pins the documented no-memory behaviour, and licenses the other cases to re-enter by direct navigation rather than minting an account each. |
+| Abandoning the wizard part-way leaves the dashboard reachable | Pins the absence of a completion gate. If one is added, this notices. |
+
+### The guided checklist — and actually doing its tasks
+
+Reopened at explicit request after the brief's dashboard cutoff had ruled it
+out. The tasks are pressed and followed, not just counted.
+
+| Scenario | What it protects |
+|---|---|
+| A new account lands with one of seven tasks done | Seven titles in order, `Account created` ticked, `14%`. Signing up *is* task 1. |
+| Expanding a task reveals its call to action and collapses the previous one | Catches both accordion halves — one that never opens and one that never closes. |
+| Completing a task ticks it off and moves the readout, and it persists | Progress is account state, not view state, so the reload is the real assertion. |
+| Dismissing the checklist removes it for good | No confirmation, and it does not come back. |
+| **Dragging a shift template onto the schedule completes "Add your first shift"** | The suite's one drag and drop, and the only place either journey asks for more than a click. The shift lands, the checklist ticks, and a fresh page load finds the shift still there. |
+| "Optimise your schedule" enables the scheduling defaults | The quick setup is not a preview — it turns three features on and says so. |
+| "Track employee hours" opens the time-tracking setup and unblocks on a choice | `Next` is disabled until a method is picked, so the disabled-then-enabled flip is what proves the choice registered. |
+| Taking the absence tour completes "Manage employee absences" | Starting is enough — it ticks even when the tour is skipped, which is the opposite of what the two quick setups do. |
+| Every task that stays incomplete keeps its call to action | The counterweight to stopping at a handoff: it makes "we stopped here" a recorded fact rather than an omission. |
+
+Two of those tasks lead into scheduling and time-tracking setup, which are past
+the dashboard and outside the brief. The tests assert each handoff and stop at
+the boundary rather than walking a five-step time-tracking configuration —
+that would be testing time tracking.
 
 ## How the account problem is solved
 
@@ -211,8 +247,8 @@ run marked *flaky*, that is the environment, not a race.
 
 ## Defects found while building this
 
-Three confirmed defects, each reproduced at least twice before being written
-down. Two carry failing tests; the third is reported without one, for the
+Four confirmed defects, each reproduced at least twice before being written
+down. Three carry failing tests; one is reported without a test, for the
 reason given below.
 
 **Screen recordings and screenshots for each are in
@@ -278,10 +314,11 @@ To run without them:
 npm run test:no-defects        # or: npx playwright test --grep-invert @known-defect
 ```
 
-Expected results today: **23 passed, 6 failed** on a full run — the 6 failures
+Expected results today: **37 passed, 7 failed** on a full run — the 7 failures
 are all `@known-defect` (these two duplicate-email tests, the router blank-page
-test, the two employee-count tests, and the login rate-limit test from the
-exploratory pass below); **23 passed** with the known-defect tests excluded.
+test, the two employee-count tests, the login rate-limit test from the
+exploratory pass below, and the checklist invite-dialog test described next);
+**37 passed** with the known-defect tests excluded.
 
 One implementation note, since the first version of this test got it wrong:
 it asserts that a conflict message *is present*, not that the questionnaire
@@ -300,6 +337,28 @@ counts down daily and the first-run modal varies between runs, so a snapshot
 would be noise. The fix is a `maxlength` on the input and truncation in the
 heading; a meaningful test comes after that, not before.
 
+### 4. The checklist's "Invite your team" opens an empty dialog
+
+Found later, while building the guided-checklist tests. Pressing `Start` on
+checklist task 6 mounts `invite-employees-dialog` and it renders nothing: the
+host element has **zero children**, and the `[role="dialog"]` around it
+measures **750 × 2 pixels**. The user sees the page dim behind a modal with no
+content, no fields and no way to invite anyone. The task cannot be completed,
+because its flow never appears.
+
+Reproduced three times on a freshly minted account, waiting up to seven
+seconds each time in case it was rendering late. The other six tasks render
+fine on the same page load, and the console shows only the sandbox's usual
+blocked third-party scripts.
+
+One honest caveat: unlike the adversarial findings below, this one did not go
+through the independent refute pass — it was found while writing the tests. It
+is stated as what was observed, three times, on one environment.
+
+Covered by `tests/e2e/onboarding/checklist-tasks.spec.ts` › `TSK-06` (fails).
+It runs last in its file, because a serial file stops at its first failure and
+the cases before it are real.
+
 ### Also observed, not defects
 
 Worth knowing, and recorded in `tests/e2e/docs/app-context.md`:
@@ -309,7 +368,20 @@ Worth knowing, and recorded in `tests/e2e/docs/app-context.md`:
   registration step 1. The in-app `Back` button does preserve answers. Defensible
   as designed, but a long questionnaire with no resume is a conversion risk.
 - **Onboarding completion is unenforced** — the dashboard is reachable without
-  ever visiting `/onboarding`.
+  ever visiting `/onboarding`, and the wizard keeps no memory of having run:
+  revisiting it on a finished account restarts it from the teams step. Both are
+  now pinned by `ONB-04` and `ONB-05`.
+- **The navigation ships in more than one shape.** The sidebar variant carrying
+  the "Get started" checklist entry was observed present on one visit and gone
+  on the next, for the same account, in the same session — with and without the
+  `?campaign=new-nav` query that first surfaced it. The dashboard checklist
+  widget was there every time, so that is the surface the checklist tests use.
+- **First-run coach marks sit on top of the work.** `sb-popover` overlays
+  render over the checklist and the schedule grid and swallow clicks aimed
+  underneath rather than looking like they are in the way. On the schedule they
+  also matter for correctness, not just clicks: clearing them before accepting
+  the guided tour walks the tour with them, and the shift dragged afterwards no
+  longer counts toward the checklist.
 - **Concurrent sessions are allowed**, and logging out of one leaves the other
   authenticated.
 - **A stale session is handled well**: deleting the cookie mid-session and

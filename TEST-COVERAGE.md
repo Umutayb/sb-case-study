@@ -11,21 +11,21 @@ it. For how to run the suite and the higher-level reasoning, see the
 
 | | Count |
 |---|---|
-| Total tests | **29** |
-| Passing | **23** |
-| Failing on purpose (`@known-defect`) | **6** |
-| Spec files | 11 (+ 1 setup) |
-| Pages mapped | 6 |
-| Findings | **7** (3 while building, 4 from a dedicated exploratory pass) |
+| Total tests | **44** |
+| Passing | **37** |
+| Failing on purpose (`@known-defect`) | **7** |
+| Spec files | 14 (+ 1 setup) |
+| Pages mapped | 10 |
+| Findings | **8** (3 while building, 4 from a dedicated exploratory pass, 1 while building the checklist tests) |
 
 Two run commands:
 
 ```bash
-npm test                # 23 passed, 6 failed  — the 6 are @known-defect, they fail by design
-npm run test:no-defects # 23 passed, 0 failed  — the suite minus the known-defect tests
+npm test                # 37 passed, 7 failed  — the 7 are @known-defect, they fail by design
+npm run test:no-defects # 37 passed, 0 failed  — the suite minus the known-defect tests
 ```
 
-The 6 failures are **intentional**. Each `@known-defect` test describes the
+The 7 failures are **intentional**. Each `@known-defect` test describes the
 behaviour the product *should* have; it fails today and turns green the day the
 bug is fixed.
 See [Bug findings](#bug-findings) below.
@@ -54,17 +54,19 @@ means signup is exercised on every run, not only when its own spec runs.
 
 **Interaction style.** Every test drives the app through the
 `@civitas-cerebrum/element-interactions` Steps API; selectors live in
-`tests/e2e/page-repository.json`, one entry per element, referenced by name. No
-raw `page.locator` / `page.goto` appears in any test body.
+`tests/e2e/data/page-repository.json`, one entry per element, referenced by
+name. No raw `page.locator` / `page.goto` appears in any test body.
 
 **Reusable flows.** The multi-step journeys live in `tests/e2e/flows/` so they
 are written once and shared: `signup-flow.ts` (registration → questionnaire →
-wizard → dashboard) and `login-flow.ts` (submit → MFA interstitial →
-dashboard).
+wizard → dashboard), `login-flow.ts` (submit → MFA interstitial → dashboard),
+`onboarding-flow.ts` (the wizard's steps, asserted rather than clicked
+through), and `checklist-flow.ts` (the guided checklist's tasks, its
+progress readout, and the coach marks that sit on top of both).
 
 ---
 
-## Passing tests (23)
+## Passing tests (37)
 
 ### Signup & onboarding — `signup.spec.ts`
 
@@ -127,6 +129,64 @@ different per field, so the assertions target the reliable signal.
 | `LGN-11` **logging out of one session does not affect a concurrent session for the same account** | Documents the app's actual multi-session behaviour rather than assuming single-session semantics. Uses a dedicated minted account so it can't disturb sibling tests. |
 | `LGN-12` **a session invalidated mid-interaction redirects to login instead of hanging or blanking** | Clears the session cookie, then triggers an API-bound action; the app redirects cleanly rather than freezing. (The session is cookie-only — `shifttime`, HttpOnly/Secure/SameSite=Strict — so clearing the cookie is a faithful stale-session simulation.) |
 
+### Onboarding wizard — `onboarding/wizard.spec.ts`
+
+`signup.spec.ts` proves the wizard can be got *past*. These are about the
+wizard itself.
+
+| Test | Asserts |
+|---|---|
+| `ONB-01` **the wizard walks teams, employees and shift templates to the completion screen** | Each step is the step it claims to be, and arrives pre-filled as documented: the business name on teams, the registering user on employees, `Day shift` / 09:00 / 17:30 on templates. Also pins the progress bar at 83.33 on step 2 — it is shared with the signup questionnaire, so it measures the whole registration journey, and a wizard that gained or lost a step without moving it would mean the two had come apart. |
+| `ONB-02` **a team added in the teams step is selectable against an employee** | The wizard's one observable cross-step effect. Asserted on the full option list, so a team going missing fails as loudly as one appearing twice. |
+| `ONB-03` **skipping every step still reaches the completion screen** | `Skip` is not a dead end — the whole wizard is optional. |
+| `ONB-04` **re-entering the wizard after finishing it starts over from the teams step** | Pins the documented no-memory behaviour. It is also what licenses `ONB-02`, `ONB-03` and `ONB-05` to re-enter by direct navigation instead of minting an account each. |
+| `ONB-05` **abandoning the wizard part-way still leaves the dashboard reachable** | Pins the absence of a completion gate. If one is ever added, this is what notices. |
+
+**One signup, five tests.** The file is serial: `ONB-01` mints the account
+through the real signup and the rest log in. Re-minting per scenario would
+spend half an hour re-proving `SGN-01`.
+
+### Guided checklist — `onboarding/checklist.spec.ts`
+
+The seven-task "Get started" checklist that outlives the wizard.
+
+| Test | Asserts |
+|---|---|
+| `CHK-01` **a new account lands with one of seven tasks done** | All seven titles in render order, `Account created` already ticked, progress `14%`. Signing up *is* task 1, so a new account is never at zero. |
+| `CHK-02` **expanding a task reveals its call to action and collapses the previous one** | Description and `Start` for the expanded task, then the expanded-task count after opening a second — which catches both halves at once: a second accordion that never opens, and a first that never closes. |
+| `CHK-03` **completing a task ticks it off and moves the progress readout** | Drives `Download mobile app` to `Done!` — the one task with no product area behind it — and watches `14%` become `28%`. Then reloads: progress is account state, not view state, so a reload has to find it still done. |
+| `CHK-04` **dismissing the checklist removes it for good** | No confirmation step, and it does not come back after a fresh page load. |
+
+**Why this file is serial and owns its account.** Dismissal is account-level
+and permanent. `CHK-04` burns the checklist for good, so it runs last against
+an account nothing else still needs.
+
+### Guided checklist — doing the tasks — `onboarding/checklist-tasks.spec.ts`
+
+Each task's `Start` pressed and followed where it goes.
+
+| Test | Asserts |
+|---|---|
+| `TSK-01` **dragging a shift template onto the schedule completes "Add your first shift"** | The suite's one drag and drop. `Start` routes to the schedule with `;onboardingStep=SCHEDULE_SHIFT`, the guided tour asks for a drag, and the `Day shift` template is dragged from the left panel onto an employee's day. Then: the shift renders, the checklist ticks the task and moves to `28%`, and a fresh page load finds the shift still there. |
+| `TSK-02` **"Optimise your schedule" enables the scheduling defaults** | `Start quick setup` is not a preview — it turns availability management, open shifts and shift exchange on, and says so. The confirmation is the observable effect. |
+| `TSK-03` **"Track employee hours" opens the time-tracking setup and unblocks on a choice** | The wizard refuses to advance until a tracking method is picked, so the disabled-then-enabled flip on `Next` is what proves the choice registered — the dialog looks identical either way. |
+| `TSK-04` **taking the absence tour completes "Manage employee absences"** | Starting the tour is enough; the task ticks even when the tour is skipped rather than watched. Worth pinning precisely because it is the opposite of what tasks 3 and 4 do. |
+| `TSK-05` **every task that stays incomplete keeps its call to action** | The counterweight to stopping at a handoff: tasks 3, 4 and 6 are asserted still incomplete, each still offering `Start`. Guards against a task that ticks itself just for having been opened. |
+| `TSK-06` **"Invite your team" opens an invite dialog** `@known-defect` | Fails on purpose — the dialog mounts with zero children and a 750 × 2 px box. See **B8** below. Runs last, because a serial file stops at its first failure. |
+
+**Three tasks complete, two hand off, one is broken.** Tasks 2, 5 and 7 tick
+themselves off and the tests assert exactly that. Tasks 3 and 4 lead into
+scheduling and time-tracking setup, which are past this journey's exit — the
+tests assert the handoff and stop there rather than walking a five-step
+time-tracking configuration, which would be testing time tracking.
+
+**The thing that took longest to get right** was not the drag. It was
+discovering that the tour splash has to be accepted *before* the coach marks
+are cleared: clear first and the schedule's own walkthrough gets walked with
+it, the onboarding context dies, and the shift that follows lands on the
+schedule while the checklist quietly ignores it. Green test, no shift counted.
+The ordering is commented in `checklist-flow.ts` where it matters.
+
 ### Account provisioning — `setup/account.setup.ts`
 
 | Test | What it does |
@@ -137,19 +197,21 @@ different per field, so the assertions target the reliable signal.
 
 ## Bug findings
 
-Seven findings, **zero false positives**. Three were found while
-building the suite; four came from a dedicated exploratory pass in which every
-finding was reproduced, then handed to an independent verifier whose only job
-was to *disprove* it. None was refuted, and three had their severity corrected
-by the verifier — the corrections are the evidence the refutation was real.
+Eight findings, **zero false positives**. Three were found while building the
+suite; four came from a dedicated exploratory pass in which every finding was
+reproduced, then handed to an independent verifier whose only job was to
+*disprove* it. None was refuted, and three had their severity corrected by the
+verifier — the corrections are the evidence the refutation was real. The
+eighth (**B8**) turned up later, while building the checklist tests, and did
+not go through that second stage; its entry says so.
 
-Four findings became `@known-defect` regression tests; the other three are
+Five findings became `@known-defect` regression tests; the other three are
 documented with the reason they are reported rather than automated. A finding
 that can only be shown with an on-demand gateway error, a destructive
 rate-limit probe, a wall-clock timing threshold, or an exploit that shouldn't
 run on every CI trigger makes a worse test than a clear report.
 
-### Found while building (3)
+### Found while building (4)
 
 #### B1 — An unrecognised modal route blanks the application · **automated**
 Navigating to `/dashboard/my-overview(modal:<anything-unrecognised>)` makes the
@@ -175,6 +237,21 @@ Reported without a test: asserting "the layout is broken" needs a
 visual-regression baseline this environment cannot support (the trial banner
 counts down daily, the first-run modal varies per run). The fix is a `maxlength`
 plus truncation; a meaningful test comes after that.
+
+#### B8 — The checklist's "Invite your team" opens an empty dialog · **automated**
+Pressing `Start` on checklist task 6 mounts `invite-employees-dialog` and it
+renders nothing: **zero children**, and the `[role="dialog"]` around it
+measures **750 × 2 pixels**. The page dims behind a modal with no content, no
+fields, and no way to invite anyone — the task cannot be completed because its
+flow never appears. Reproduced 3× on a freshly minted account, waiting up to
+seven seconds each time for late rendering. The other six tasks render fine on
+the same page load, and the console shows only the sandbox's usual blocked
+third parties.
+
+Unlike **A1–A4**, this one did not go through the independent refute stage —
+it was found while building the checklist tests. What can be claimed is what
+was observed, three times, on one environment.
+*Test:* `onboarding/checklist-tasks.spec.ts` › `TSK-06`
 
 ### Adversarial pass (8)
 
@@ -229,6 +306,7 @@ defect is a weak regression guard, and this is a minor UX inconsistency.
 | `signup-duplicate-email.spec.ts` | `@known-defect` (×2) | B2 |
 | `signup-employee-count.spec.ts` | `@known-defect` (×2) | A2 |
 | `login-rate-limit.spec.ts` | `@known-defect` | A3 |
+| `onboarding/checklist-tasks.spec.ts` › `TSK-06` | `@known-defect` | B8 |
 | *(reported, no test)* | — | B3, A1, A4 |
 
 ---
@@ -238,7 +316,16 @@ defect is a weak regression guard, and this is a minor UX inconsistency.
 Stated so the omissions read as decisions, not gaps:
 
 - **Everything past the dashboard** — the brief scopes the flow to reaching the
-  dashboard; scheduling, timesheets, absence, payroll are out.
+  dashboard; scheduling, timesheets, absence, payroll are out. **One exception,
+  by request:** the guided "Get started" checklist, which the brief's cutoff
+  originally excluded and which was reopened explicitly. Its tasks lead into
+  those same out-of-scope areas, so the tests assert each task's handoff and
+  stop at the boundary — with `TSK-05` recording that they stopped, rather than
+  leaving it implied.
+- **The checklist's side panel** — the same checklist state also renders behind
+  a sidebar "Get started" entry, which belongs to a navigation variant observed
+  appearing and then disappearing for one account mid-session. A spec for it
+  would fail on the variant rather than on the product.
 - **Password reset** — reachable from `/login/forgot`, but outside both named
   flows.
 - **An exhaustive field-validation matrix** — one representative case per

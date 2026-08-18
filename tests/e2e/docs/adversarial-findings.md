@@ -111,11 +111,40 @@ not a brute-force-specific credential throttle.
   protection engages at a threshold an attacker would clear trivially, not a
   brute-force run. Verified deterministic across repeated runs.
 
+## j-guided-checklist
+
+### j-guided-checklist-01 — "Invite your team" opens an empty dialog [medium]
+
+Pressing `Start` on checklist task 6 mounts `invite-employees-dialog` and it
+renders nothing. The host element is in the DOM with **zero children**, and the
+`[role="dialog"]` around it measures 750 × 2 pixels — so a user sees the page
+dim behind a modal with no content, no fields, and no way to invite anyone. The
+task is unreachable by design: it cannot be completed because its flow never
+appears.
+
+- **Reproduced:** 3 times on a freshly minted account, from the dashboard
+  checklist widget, waiting up to 7 seconds each time for late rendering.
+  Console shows only the sandbox's usual blocked third parties (GTM, HubSpot,
+  Hotjar, Sentry, RudderStack, customer.io) — none of which the other six
+  tasks need either, and the other six render fine on the same page load.
+- **Verification caveat, stated plainly:** unlike the findings above, this one
+  was *not* put through the separate refute stage — it was found and
+  reproduced while building the checklist tests, in a session with no second
+  verifier. What can be said is what was observed, three times, on one
+  environment. A blocked third-party script cannot be fully ruled out as the
+  cause from outside the app, though nothing in the console points at one.
+- **Automated:** `tests/e2e/onboarding/checklist-tasks.spec.ts` `TSK-06`
+  (`@known-defect`). The test asserts the dialog becomes visible — the
+  behaviour the task promises — so it goes green the day the dialog renders,
+  with no edit. It is the last test in a serial file, so its intentional
+  failure does not cut short the cases after it.
+
 ## Pass summary
 
-Probed: 2 journeys. Findings retained: 4 (2 high, 1 medium, 1 low). Refuted: 0.
-Automated as regression tests: 2 — `signup-employee-count.spec.ts` (two
-`@known-defect` cases) and `login-rate-limit.spec.ts`.
+Probed: 3 journeys. Findings retained: 5 (2 high, 2 medium, 1 low). Refuted: 0.
+Automated as regression tests: 3 — `signup-employee-count.spec.ts` (two
+`@known-defect` cases), `login-rate-limit.spec.ts`, and
+`onboarding/checklist-tasks.spec.ts` (`TSK-06`).
 Documented-not-automated: 2, each with the reason above.
 
 Three findings from the original pass were later dropped as too minor or too

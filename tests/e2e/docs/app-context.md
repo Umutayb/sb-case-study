@@ -102,13 +102,35 @@ so it becomes the regression guard unchanged once the defect is fixed.
 
 **Purpose:** Post-registration setup wizard.
 
-**Steps:** "Organise your teams for smarter scheduling" (teams pre-filled
-with the business name) → "Great! Now let's add your first employees." →
-"Almost there! Let's set up your Shift templates." → "🎉 You're all set,
-&lt;first name&gt;!".
+**Steps:** three data steps then a completion screen.
 
-**Actions:** Each step offers `Next` and `Skip`; the final screen offers a
-single "See Shiftbase in action!" button that completes onboarding.
+1. **Teams** — "Organise your teams for smarter scheduling". One row
+   pre-filled with the *business name* from the questionnaire (not a generic
+   default). `Add team` appends an empty row; each row past the first gets an
+   enabled delete button, the sole row's is disabled.
+2. **Employees** — "Great! Now let's add your first employees." One row
+   pre-filled with the registering user's first/last name and a `Team`
+   `<select>` whose options are exactly the teams from step 1 — a team added
+   there is selectable here, which is the wizard's one observable cross-step
+   effect. `Add employee` appends a row.
+3. **Shift templates** — "Almost there! Let's set up your Shift templates."
+   One row pre-filled `Day shift` / `09:00` / `17:30`. `Add Shift template`
+   appends a row.
+4. **Completion** — "🎉 You're all set, &lt;first name&gt;!" with a single
+   "See Shiftbase in action!" button. No progress bar on this screen.
+
+**Actions:** Each data step offers `Next` and `Skip`; both advance. Skipping
+all three still reaches the completion screen.
+
+**Progress bar:** shared with the signup questionnaire, so it reports
+progress through the whole registration journey rather than through the
+wizard alone — `aria-valuenow` is 83.33 on the employees step and 91.67 on
+the shift-templates step.
+
+**States:** No completion gate and no memory. Re-entering `/onboarding` on an
+account that already finished it restarts at the teams step with the same
+pre-filled business name, and abandoning the wizard mid-way does not block
+`/dashboard/my-overview`.
 
 **Navigation:** Reached from `/signup`; hands off to
 `/dashboard/my-overview(modal:highlights)`.
@@ -193,3 +215,48 @@ path prefix rather than the full URL.
 
 **Navigation:** Reached from `/onboarding` (signup flow) and from
 `/login/mfa-promote` (login flow).
+
+**First-run coach mark:** arriving from signup with `?campaign=new-nav` also
+opens a "New navigation" popover in a `.cdk-overlay-pane`, positioned over
+the left of the page. It overlaps the guided-checklist panel and swallows
+clicks aimed at it, so anything driving the checklist has to dismiss the
+popover ("Got it!") first. It does not appear on a plain login.
+
+## Guided checklist ("Get started") — on `/dashboard/my-overview`
+
+**Purpose:** A seven-task onboarding checklist that persists after the
+`/onboarding` wizard finishes. It renders twice, from the same state:
+
+- `my-checklist-widget` — a card on the dashboard itself.
+- `checklist-panel` — a side panel opened by the sidebar "Get started" entry
+  (which carries its own progress bar) and closed by the panel's "Close"
+  button. Closing removes the panel from the DOM.
+
+**Tasks (fixed order):** 1. Account created · 2. Add your first shift ·
+3. Optimise your schedule · 4. Track employee hours · 5. Manage employee
+absences · 6. Invite your team · 7. Download mobile app.
+
+**Data fields:** each task is an `sb-checklist-item` carrying
+`aria-expanded`; its status icon is `sb-icon[aria-label='check-circle-solid']`
+when complete and `sb-icon[aria-label='circle']` when not. A fresh account has
+task 1 complete and the progress bar reads `14%`, above the line "Great job –
+You've got this &lt;first name&gt;! 🚀".
+
+**Actions:**
+- Clicking a task header expands it, revealing a one-line description and a
+  `Start` button (tasks 3–5 also offer `Show me`). It is a one-at-a-time
+  accordion: opening another task collapses the current one, and clicking the
+  open task again does *not* collapse it.
+- `Start` on "Add your first shift" routes to
+  `/schedule/employee/week;onboardingStep=SCHEDULE_SHIFT` and opens a guided
+  overlay.
+- `Dismiss checklist` (present in both the widget and the panel) removes the
+  widget *and* the sidebar "Get started" entry with no confirmation, and the
+  dismissal is account-level — it survives a reload.
+
+**States:** progress is account state, not session state; it survives a full
+page load and a fresh login.
+
+**Note for tests:** anything that dismisses the checklist burns the account
+for every later checklist assertion, so a spec that dismisses has to own a
+freshly minted account and run after the read-only ones.

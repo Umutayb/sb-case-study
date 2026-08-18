@@ -3,7 +3,9 @@
 Companion to `tests/e2e/docs/journey-map.md`. Maps every authored journey
 (and sub-journey) to the spec file(s) and test title(s) that cover each of
 its authored `Test expectations` / supporting assertions, or `<missing>`
-where no spec exists yet. Two journeys, both P0: j-signup-onboard, j-login.
+where no spec exists yet. Four journeys: j-signup-onboard and j-login (P0),
+j-onboarding-wizard and j-guided-checklist (P1, added 2026-08-18 by user
+request — see each block's Scope note in the journey map).
 
 **Suite snapshot (re-derived from `npx playwright test --list` + spec
 reading, not taken on trust):** 9 spec files — `signup.spec.ts`,
@@ -74,6 +76,64 @@ recorded as such in the README rather than as a bug.
 
 *Note: the malformed-dashboard-modal defect (j-signup-onboard's Edge case) is auth-state-independent and was confirmed to reproduce on an authenticated session reached via login too. `router-malformed-modal.spec.ts` covers it once; no separate login-specific repro is listed as missing here.*
 
+## j-onboarding-wizard
+
+| Expectation | Spec / test | Status |
+|---|---|---|
+| Full journey test (teams → employees → templates → completion) | `onboarding/wizard.spec.ts` › `ONB-01` | Covered |
+| Cross-step data flow — a team added on step 1 is selectable on step 2 | `onboarding/wizard.spec.ts` › `ONB-02` | Covered |
+| Branch — skipping every step still completes | `onboarding/wizard.spec.ts` › `ONB-03` | Covered |
+| Branch — re-entry after completion restarts from the teams step | `onboarding/wizard.spec.ts` › `ONB-04` | Covered |
+| Branch — abandoning mid-wizard leaves the dashboard reachable | `onboarding/wizard.spec.ts` › `ONB-05` | Covered |
+| Error state — any | — | Not applicable: the wizard has no validation. Every field arrives pre-filled and both controls advance unconditionally, so there is no failure branch to author. |
+| Edge case — emptied team name, or a team row deleted to zero | — | `<missing>` |
+| Mobile | — | Not applicable, with rationale on the journey block: three pre-filled rows and a Next button, no layout risk the registration form's `@mobile` check does not already cover. |
+| Performance baseline | — | `<missing>` |
+
+**Journey coverage: 5/7 authored expectations covered** (the two
+not-applicable rows are excluded from the denominator rather than counted as
+free wins).
+
+## j-guided-checklist
+
+| Expectation | Spec / test | Status |
+|---|---|---|
+| Initial state — seven tasks in order, one done, `14%` | `onboarding/checklist.spec.ts` › `CHK-01` | Covered |
+| Accordion — one task expanded at a time, description + CTA revealed | `onboarding/checklist.spec.ts` › `CHK-02` | Covered |
+| Completing a task ticks it off, moves the readout, and persists | `onboarding/checklist.spec.ts` › `CHK-03` | Covered |
+| Dismissal removes the checklist permanently | `onboarding/checklist.spec.ts` › `CHK-04` | Covered |
+| Task 2 — drag a shift template onto the schedule, task completes | `onboarding/checklist-tasks.spec.ts` › `TSK-01` | Covered |
+| Task 3 — quick setup enables the scheduling defaults | `onboarding/checklist-tasks.spec.ts` › `TSK-02` | Covered (at the handoff) |
+| Task 4 — quick setup opens the time-tracking wizard, unblocks on a choice | `onboarding/checklist-tasks.spec.ts` › `TSK-03` | Covered (at the handoff) |
+| Task 5 — the absence tour completes the task | `onboarding/checklist-tasks.spec.ts` › `TSK-04` | Covered |
+| Guard — opening a task does not tick it off | `onboarding/checklist-tasks.spec.ts` › `TSK-05` | Covered |
+| Error state — task 6's invite dialog renders empty (defect) | `onboarding/checklist-tasks.spec.ts` › `TSK-06` (`@known-defect`, fails on purpose) | Covered (defect-tracking) |
+| Edge case — the `checklist-panel` side surface | — | `<missing>`, deliberately — see below |
+| Edge case — a checklist at 7/7 | — | `<missing>` |
+| Mobile | — | Not applicable, with rationale on the journey block. |
+| Performance baseline | — | `<missing>` |
+
+**Journey coverage: 10/13 authored expectations covered.**
+
+**Why tasks 3 and 4 are "covered at the handoff" rather than end to end.**
+Neither ticks its task off when its quick setup is started — task 3's
+confirmation reports the defaults are enabled and stops there, and task 4
+opens a five-step `time-tracking-dialog` whose `Next` unlocks on a choice.
+Driving those to completion would be testing scheduling and time tracking,
+which are past this journey's exit and outside the brief. The tests assert
+the real, observable effect each `Start` produces and stop at the boundary.
+`TSK-05` is the counterweight: it asserts those tasks are *still* incomplete
+afterwards, so "we stopped at the handoff" is a recorded fact in the suite
+rather than an omission.
+
+**Why the side panel is deliberately unbuilt.** The checklist renders from
+one state in two places — the dashboard widget and a `checklist-panel` opened
+from a sidebar "Get started" entry. That entry belongs to a navigation
+variant that was observed present on one visit and absent on the next for the
+same account, in the same session, with and without the `?campaign=new-nav`
+query. The widget was there every time. A spec for the panel would fail on
+the variant rather than on the product, so the gap is recorded instead.
+
 ## sj-dash-landing
 
 No standalone spec, and none is expected — this sub-journey is exercised
@@ -110,6 +170,17 @@ future coverage-expansion backlog for this project.
 |---|---|---|---|---|
 | j-signup-onboard | P0 | 10 | 6 | 4 |
 | j-login | P0 | 15 | 12 | 3 |
+| j-onboarding-wizard | P1 | 7 | 5 | 2 |
+| j-guided-checklist | P1 | 13 | 10 | 3 |
+
+33/45 authored expectations covered across all four journeys (73%).
+
+The two P1 journeys sit at 71% and 77%. Their open rows are the two
+performance baselines (out of scope for a functional brief, as for the P0
+journeys), one adversarial edge case on the wizard, and two on the checklist —
+the side-panel surface, which is unbuildable against a navigation variant that
+comes and goes, and a 7/7 checklist, which needs product areas past this
+journey's exit driven to completion. None is budget-driven.
 
 18/25 authored expectations covered across the two in-scope P0 journeys
 (72%). **P0 hard gate: not met.** Per the journey-mapping skill's Phase 5
