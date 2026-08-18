@@ -55,6 +55,22 @@ SLOW_MO=600 npm run test:headed
 
 `npm run test:debug` adds the Playwright inspector on top.
 
+### Running one case
+
+Every test title starts with a stable ID — `LGN-04 · a wrong password is
+rejected` — and `test:id` greps on it, headed and paced:
+
+```bash
+SLOW_MO=1200 npm run test:id -- "LGN-04"             # one case, watched
+SLOW_MO=1200 npm run test:id -- "LGN-0(1|2|4)"       # several — grep is a regex
+SLOW_MO=1200 npm run test:id -- "LGN-04" --no-deps   # skip the setup project
+```
+
+The `setup` project runs first regardless of the grep, since Playwright does not
+filter dependency projects — `--no-deps` skips it when an account is already
+cached. The full index lives in
+[`tests/e2e/docs/test-ids.md`](tests/e2e/docs/test-ids.md).
+
 ### Optional configuration
 
 Copy `.env.example` to `.env` if you want to point the suite elsewhere or use
@@ -244,10 +260,10 @@ state. The two tests describe how the product should behave; it does not
 behave that way, so the suite says so.
 
 ```
-✘ registering an already-used email surfaces a conflict message
+✘ SGN-10 · registering an already-used email surfaces a conflict message
     expect(locator).toContainText(/already (registered|in use|exists)/i) failed
 
-✘ a password set during a duplicate registration works at login
+✘ SGN-11 · a password set during a duplicate registration works at login
     TimeoutError: page.waitForURL: Timeout 20000ms exceeded
 ```
 

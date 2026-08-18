@@ -1,12 +1,12 @@
-import { test, expect } from './fixtures/base';
-import { Routes, UrlPattern, uniqueEmail } from './fixtures/test-data';
-import { readAccount } from './fixtures/auth';
-import { submitLogin } from './flows/login-flow';
+import { test, expect } from '../fixtures/base';
+import { Routes, UrlPattern, uniqueEmail } from '../data/test-data';
+import { readAccount } from '../fixtures/auth';
+import { submitLogin } from '../flows/login-flow';
 
 const LOGIN = 'LoginPage';
 
 test.describe('Login — rejected attempts', () => {
-  test('submitting an empty form reports both required fields', async ({ steps }) => {
+  test('LGN-03 · submitting an empty form reports both required fields', async ({ steps }) => {
     await steps.navigateTo(Routes.LOGIN, { waitUntil: 'domcontentloaded' });
     await steps.click('loginButton', LOGIN);
 
@@ -18,7 +18,7 @@ test.describe('Login — rejected attempts', () => {
     await steps.verifyUrlContains('/login');
   });
 
-  test('a wrong password is rejected', async ({ steps }) => {
+  test('LGN-04 · a wrong password is rejected', async ({ steps }) => {
     const { email } = readAccount();
 
     await submitLogin(steps, email, 'definitely-not-the-password');
@@ -32,7 +32,7 @@ test.describe('Login — rejected attempts', () => {
     await steps.verifyUrlContains('/login');
   });
 
-  test('an unknown email is rejected', async ({ steps }) => {
+  test('LGN-05 · an unknown email is rejected', async ({ steps }) => {
     await submitLogin(steps, uniqueEmail(), 'definitely-not-the-password');
 
     await steps.verifyPresence('errorAlert', LOGIN);
@@ -45,7 +45,7 @@ test.describe('Login — rejected attempts', () => {
    * the login form becomes an account-enumeration oracle. This asserts the
    * two are the same string rather than asserting each one separately.
    */
-  test('rejection does not reveal whether the account exists', async ({ steps }) => {
+  test('LGN-06 · rejection does not reveal whether the account exists', async ({ steps }) => {
     const { email } = readAccount();
 
     await submitLogin(steps, email, 'definitely-not-the-password');
@@ -60,7 +60,7 @@ test.describe('Login — rejected attempts', () => {
     expect(messageForRealAccount?.trim()).toBeTruthy();
   });
 
-  test('a logged-out visitor cannot reach the dashboard directly', async ({ steps }) => {
+  test('LGN-07 · a logged-out visitor cannot reach the dashboard directly', async ({ steps }) => {
     await steps.navigateTo('/dashboard/my-overview', { waitUntil: 'domcontentloaded' });
 
     await steps.waitForUrl(UrlPattern.LOGIN, undefined, { timeout: 20000 });

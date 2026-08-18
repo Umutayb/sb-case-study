@@ -1,6 +1,6 @@
-import { test } from './fixtures/base';
-import { buildUser } from './fixtures/test-data';
-import { submitRegistrationForm } from './flows/signup-flow';
+import { test } from '../fixtures/base';
+import { buildUser } from '../data/test-data';
+import { submitRegistrationForm } from '../flows/signup-flow';
 
 const QUIZ = 'SignupQuestionnairePage';
 
@@ -50,7 +50,7 @@ const QUIZ = 'SignupQuestionnairePage';
 test.describe('Signup — employee count validation (known defect) @known-defect', () => {
   test.describe.configure({ timeout: 60_000 });
 
-  test('a decimal employee count does not block the Next button', async ({ steps }) => {
+  test('SGN-12 · a decimal employee count does not block the Next button', async ({ steps }) => {
     const user = buildUser();
     await submitRegistrationForm(steps, user);
 
@@ -68,7 +68,7 @@ test.describe('Signup — employee count validation (known defect) @known-defect
     await steps.expect('nextButton', QUIZ).timeout(8000).enabled.toBe(false);
   });
 
-  test('an unbounded employee count does not block the Next button', async ({ steps }) => {
+  test('SGN-13 · an unbounded employee count does not block the Next button', async ({ steps }) => {
     const user = buildUser();
     await submitRegistrationForm(steps, user);
 

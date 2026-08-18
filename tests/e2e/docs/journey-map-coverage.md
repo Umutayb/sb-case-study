@@ -25,14 +25,14 @@ the prior version of this document: 5 in `signup-validation.spec.ts`, 4 in
 
 | Expectation | Spec / test | Status |
 |---|---|---|
-| Full journey test (entry → exit) | `signup.spec.ts` › "a new trial account reaches the dashboard" | Covered |
-| Supporting: registration → questionnaire handoff | `signup.spec.ts` › "the registration form hands off to the questionnaire" | Covered |
+| Full journey test (entry → exit) | `signup.spec.ts` › `SGN-01` "a new trial account reaches the dashboard" | Covered |
+| Supporting: registration → questionnaire handoff | `signup.spec.ts` › `SGN-03` "the registration form hands off to the questionnaire" | Covered |
 | Mobile: yes (registration form) | `signup.spec.ts` › "the registration form is usable on a mobile viewport `@mobile`" | Covered |
 | Error state — duplicate email accepted silently (defect) | `signup-duplicate-email.spec.ts` › both tests (`@known-defect`, fail on purpose) | Covered (defect-tracking) |
-| Error state — malformed dashboard modal aux-route blanks the page (defect) | `router-malformed-modal.spec.ts` › "an unknown modal auxiliary route does not blank the page" (`@known-defect`, fails on purpose) | Covered (defect-tracking) |
+| Error state — malformed dashboard modal aux-route blanks the page (defect) | `router-malformed-modal.spec.ts` › `RTR-01` "an unknown modal auxiliary route does not blank the page" (`@known-defect`, fails on purpose) | Covered (defect-tracking) |
 | Error state — empty submit / invalid email / invalid phone / weak password / unticked terms | `signup-validation.spec.ts` › all 5 tests | Covered |
 | Edge case — 300-char first name, no length cap, breaks questionnaire heading layout (defect) | — | `<missing>` |
-| Edge case — wizard progress lost on browser back/forward or direct URL revisit, no warning/resume | `signup-persistence.spec.ts` › "leaving the signup flow and returning discards questionnaire progress" | Covered — see reclassification note below |
+| Edge case — wizard progress lost on browser back/forward or direct URL revisit, no warning/resume | `signup-persistence.spec.ts` › `SGN-09` "leaving the signup flow and returning discards questionnaire progress" | Covered — see reclassification note below |
 | Edge case — whitespace-padded name fields silently accepted (minor, unconfirmed) | — | `<missing>` |
 | Performance baseline | — | `<missing>` |
 
@@ -42,17 +42,17 @@ the prior version of this document: 5 in `signup-validation.spec.ts`, 4 in
 
 | Expectation | Spec / test | Status |
 |---|---|---|
-| Full journey test (entry → exit, incl. MFA-promote interstitial) | `login.spec.ts` › "valid credentials reach the dashboard" + "login is offered multifactor authentication before the dashboard" | Covered |
-| Error state — empty submit | `login-negative.spec.ts` › "submitting an empty form reports both required fields" | Covered |
-| Error state — wrong password | `login-negative.spec.ts` › "a wrong password is rejected" | Covered |
-| Error state — unknown email | `login-negative.spec.ts` › "an unknown email is rejected" | Covered |
-| Error state — non-enumeration (identical message) | `login-negative.spec.ts` › "rejection does not reveal whether the account exists" | Covered |
-| Error state — logged-out direct dashboard access redirects | `login-negative.spec.ts` › "a logged-out visitor cannot reach the dashboard directly" | Covered |
-| Supporting: session survives reload | `session.spec.ts` › "an authenticated session survives a reload" | Covered |
-| Supporting: primary navigation present post-login | `session.spec.ts` › "the dashboard exposes the primary navigation" | Covered |
+| Full journey test (entry → exit, incl. MFA-promote interstitial) | `login.spec.ts` › `LGN-01` "valid credentials reach the dashboard" + `LGN-02` "login is offered multifactor authentication before the dashboard" | Covered |
+| Error state — empty submit | `login-negative.spec.ts` › `LGN-03` "submitting an empty form reports both required fields" | Covered |
+| Error state — wrong password | `login-negative.spec.ts` › `LGN-04` "a wrong password is rejected" | Covered |
+| Error state — unknown email | `login-negative.spec.ts` › `LGN-05` "an unknown email is rejected" | Covered |
+| Error state — non-enumeration (identical message) | `login-negative.spec.ts` › `LGN-06` "rejection does not reveal whether the account exists" | Covered |
+| Error state — logged-out direct dashboard access redirects | `login-negative.spec.ts` › `LGN-07` "a logged-out visitor cannot reach the dashboard directly" | Covered |
+| Supporting: session survives reload | `session.spec.ts` › `SES-01` "an authenticated session survives a reload" | Covered |
+| Supporting: primary navigation present post-login | `session.spec.ts` › `SES-02` "the dashboard exposes the primary navigation" | Covered |
 | Error state — "Back to login" silently terminates the session | `login-session-edges.spec.ts` › "\"Back to login\" on the MFA prompt silently terminates the session" | Covered |
-| Edge case — concurrent sessions permitted | `login-session-edges.spec.ts` › "logging out of one session does not affect a concurrent session for the same account" | Covered |
-| Edge case — stale/cookie-invalidated session redirects gracefully mid-interaction | `login-session-edges.spec.ts` › "a session invalidated mid-interaction redirects to login instead of hanging or blanking" | Covered |
+| Edge case — concurrent sessions permitted | `login-session-edges.spec.ts` › `LGN-11` "logging out of one session does not affect a concurrent session for the same account" | Covered |
+| Edge case — stale/cookie-invalidated session redirects gracefully mid-interaction | `login-session-edges.spec.ts` › `LGN-12` "a session invalidated mid-interaction redirects to login instead of hanging or blanking" | Covered |
 | Mobile: yes (login form) | `login-session-edges.spec.ts` › "the login form is usable on a mobile viewport `@mobile`" | Covered |
 | Error state — MFA "Set up now" wrong-code alert | — | `<missing>` |
 | Edge case — MFA-promote reachable via direct nav mid-session | — | `<missing>` |

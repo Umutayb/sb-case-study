@@ -1,5 +1,5 @@
 import type { Steps } from '@civitas-cerebrum/element-interactions';
-import { Routes, UrlPattern, type TestUser } from '../fixtures/test-data';
+import { Routes, UrlPattern, type TestUser } from '../data/test-data';
 
 const SIGNUP = 'SignupPage';
 const QUIZ = 'SignupQuestionnairePage';

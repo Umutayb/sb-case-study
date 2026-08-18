@@ -1,10 +1,10 @@
 import { ElementRepository } from '@civitas-cerebrum/element-repository';
 import { Steps } from '@civitas-cerebrum/element-interactions';
-import { test } from './fixtures/base';
-import { Routes, UrlPattern, buildUser, type TestUser } from './fixtures/test-data';
-import { readAccount } from './fixtures/auth';
-import { submitLogin, logInToDashboard, logOut } from './flows/login-flow';
-import { signUpToDashboard } from './flows/signup-flow';
+import { test } from '../fixtures/base';
+import { Routes, UrlPattern, buildUser, type TestUser } from '../data/test-data';
+import { readAccount } from '../fixtures/auth';
+import { submitLogin, logInToDashboard, logOut } from '../flows/login-flow';
+import { signUpToDashboard } from '../flows/signup-flow';
 
 const LOGIN = 'LoginPage';
 const MFA = 'MfaPromotePage';
@@ -44,7 +44,7 @@ test.describe('Login — session and MFA-branch edges', () => {
    * That is surprising enough to pin down as a named regression test rather
    * than leave as an anecdote in the journey map.
    */
-  test('"Back to login" on the MFA prompt silently terminates the session', async ({ steps }) => {
+  test('LGN-09 · "Back to login" on the MFA prompt silently terminates the session', async ({ steps }) => {
     test.setTimeout(180_000);
 
     const user = await mintAccountAndLogOut(steps);
@@ -78,7 +78,7 @@ test.describe('Login — session and MFA-branch edges', () => {
    * behaviour, so re-walking it here would just double the runtime for no
    * new evidence. Safe to use the shared account since nothing is submitted.
    */
-  test('the login form is usable on a mobile viewport @mobile', async ({ steps }) => {
+  test('LGN-10 · the login form is usable on a mobile viewport @mobile', async ({ steps }) => {
     const { email, password } = readAccount();
 
     await steps.navigateTo(Routes.LOGIN, { waitUntil: 'domcontentloaded' });
@@ -111,7 +111,7 @@ test.describe('Login — session and MFA-branch edges', () => {
    * across sessions) rather than the shared one other spec files log into
    * concurrently.
    */
-  test('logging out of one session does not affect a concurrent session for the same account', async ({
+  test('LGN-11 · logging out of one session does not affect a concurrent session for the same account', async ({
     steps,
     browser,
   }) => {
@@ -127,7 +127,7 @@ test.describe('Login — session and MFA-branch edges', () => {
     // the same account.
     const contextB = await browser.newContext({ ignoreHTTPSErrors: true });
     const pageB = await contextB.newPage();
-    const repoB = new ElementRepository(pageB, 'tests/e2e/page-repository.json', 30000);
+    const repoB = new ElementRepository(pageB, 'tests/e2e/data/page-repository.json', 30000);
     const stepsB = new Steps(repoB, { timeout: 30000 });
 
     try {
@@ -161,7 +161,7 @@ test.describe('Login — session and MFA-branch edges', () => {
    * part of this redirect, which is exactly the kind of session-destroying
    * action this file keeps off the shared account.
    */
-  test('a session invalidated mid-interaction redirects to login instead of hanging or blanking', async ({
+  test('LGN-12 · a session invalidated mid-interaction redirects to login instead of hanging or blanking', async ({
     steps,
     context,
   }) => {

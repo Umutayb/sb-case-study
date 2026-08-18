@@ -1,10 +1,10 @@
-import { test } from './fixtures/base';
-import { UrlPattern } from './fixtures/test-data';
-import { readAccount } from './fixtures/auth';
-import { logInToDashboard } from './flows/login-flow';
+import { test } from '../fixtures/base';
+import { UrlPattern } from '../data/test-data';
+import { readAccount } from '../fixtures/auth';
+import { logInToDashboard } from '../flows/login-flow';
 
 test.describe('Session', () => {
-  test('an authenticated session survives a reload', async ({ steps }) => {
+  test('SES-01 · an authenticated session survives a reload', async ({ steps }) => {
     const { email, password } = readAccount();
 
     await logInToDashboard(steps, email, password);
@@ -27,7 +27,7 @@ test.describe('Session', () => {
     await steps.verifyPresence('myTimesheetsPanel', 'DashboardPage');
   });
 
-  test('the dashboard exposes the primary navigation', async ({ steps }) => {
+  test('SES-02 · the dashboard exposes the primary navigation', async ({ steps }) => {
     const { email, password } = readAccount();
 
     await logInToDashboard(steps, email, password);

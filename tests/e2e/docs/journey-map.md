@@ -100,7 +100,7 @@ Total: 27 in-app routes discovered. Gated: 0 (signup is open; no admin/paid-tier
 **Exit:** authenticated, landed on `/dashboard/my-overview` (via sj-dash-landing), first-run modal dismissed, "My schedule" panel + Schedule nav link present.
 **Test expectations:**
 - P0: full journey test (entry to exit) + Error state: [what if step N fails?] for every failure branch + Edge case: [unusual input, timing, etc.] + Mobile: [yes / no with rationale] + performance baseline
-  - Full journey test: **covered** — `signup.spec.ts` › "a new trial account reaches the dashboard".
+  - Full journey test: **covered** — `signup.spec.ts` › `SGN-01` "a new trial account reaches the dashboard".
   - Error state — duplicate email accepted silently (defect): **covered**, failing on purpose — `signup-duplicate-email.spec.ts`.
   - Error state — malformed dashboard modal aux-route blanks the page (defect): **covered**, failing on purpose — `router-malformed-modal.spec.ts`.
   - Error state — empty submit / invalid email / invalid phone / weak password / unticked terms: **gap** — driven live during discovery (cycle-2 edge-probe) but no spec currently asserts these client-side validation states.
@@ -144,12 +144,12 @@ Total: 27 in-app routes discovered. Gated: 0 (signup is open; no admin/paid-tier
 **Exit:** authenticated, landed on `/dashboard/my-overview` (via sj-dash-landing), "My schedule" + "My timesheets" panels present.
 **Test expectations:**
 - P0: full journey test (entry to exit) + Error state: [what if step N fails?] for every failure branch + Edge case: [unusual input, timing, etc.] + Mobile: [yes / no with rationale] + performance baseline
-  - Full journey test: **covered** — `login.spec.ts` › "valid credentials reach the dashboard" + "login is offered multifactor authentication before the dashboard".
-  - Error state — empty submit: **covered** — `login-negative.spec.ts` › "submitting an empty form reports both required fields".
-  - Error state — wrong password: **covered** — `login-negative.spec.ts` › "a wrong password is rejected".
-  - Error state — unknown email: **covered** — `login-negative.spec.ts` › "an unknown email is rejected".
-  - Error state — non-enumeration (identical message for both failure modes): **covered** — `login-negative.spec.ts` › "rejection does not reveal whether the account exists".
-  - Error state — logged-out direct dashboard access redirects: **covered** — `login-negative.spec.ts` › "a logged-out visitor cannot reach the dashboard directly".
+  - Full journey test: **covered** — `login.spec.ts` › `LGN-01` "valid credentials reach the dashboard" + `LGN-02` "login is offered multifactor authentication before the dashboard".
+  - Error state — empty submit: **covered** — `login-negative.spec.ts` › `LGN-03` "submitting an empty form reports both required fields".
+  - Error state — wrong password: **covered** — `login-negative.spec.ts` › `LGN-04` "a wrong password is rejected".
+  - Error state — unknown email: **covered** — `login-negative.spec.ts` › `LGN-05` "an unknown email is rejected".
+  - Error state — non-enumeration (identical message for both failure modes): **covered** — `login-negative.spec.ts` › `LGN-06` "rejection does not reveal whether the account exists".
+  - Error state — logged-out direct dashboard access redirects: **covered** — `login-negative.spec.ts` › `LGN-07` "a logged-out visitor cannot reach the dashboard directly".
   - Error state — MFA "Set up now" wrong-code alert: **gap** — driven live during discovery, no spec assertion yet.
   - Error state — "Back to login" silently terminates the session: **gap** — surprising-enough behavior to deserve an explicit regression test; none exists yet.
   - Edge case — concurrent sessions permitted: **gap**.

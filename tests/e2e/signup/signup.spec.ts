@@ -1,16 +1,16 @@
-import { test } from './fixtures/base';
-import { buildUser, Routes, UrlPattern } from './fixtures/test-data';
+import { test } from '../fixtures/base';
+import { buildUser, Routes, UrlPattern } from '../data/test-data';
 import {
   submitRegistrationForm,
   completeQuestionnaire,
   completeOnboardingWizard,
   dismissFirstRunDialog,
-} from './flows/signup-flow';
+} from '../flows/signup-flow';
 
 test.describe('Signup and onboarding', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test('a new trial account reaches the dashboard', async ({ steps }) => {
+  test('SGN-01 · a new trial account reaches the dashboard', async ({ steps }) => {
     test.setTimeout(180_000);
     const user = buildUser();
 
@@ -36,7 +36,7 @@ test.describe('Signup and onboarding', () => {
    * would double the suite's runtime to re-prove logic the desktop run
    * already covers.
    */
-  test('the registration form is usable on a mobile viewport @mobile', async ({ steps }) => {
+  test('SGN-02 · the registration form is usable on a mobile viewport @mobile', async ({ steps }) => {
     const user = buildUser();
 
     await steps.navigateTo(Routes.SIGNUP, { waitUntil: 'domcontentloaded' });
@@ -50,7 +50,7 @@ test.describe('Signup and onboarding', () => {
     await steps.verifyPresence('loginLink', 'SignupPage');
   });
 
-  test('the registration form hands off to the questionnaire', async ({ steps }) => {
+  test('SGN-03 · the registration form hands off to the questionnaire', async ({ steps }) => {
     test.setTimeout(120_000);
     const user = buildUser();
 

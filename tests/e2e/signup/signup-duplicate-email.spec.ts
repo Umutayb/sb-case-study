@@ -1,8 +1,8 @@
-import { test } from './fixtures/base';
-import { buildUser, UrlPattern } from './fixtures/test-data';
-import { readAccount } from './fixtures/auth';
-import { submitRegistrationForm } from './flows/signup-flow';
-import { submitLogin } from './flows/login-flow';
+import { test } from '../fixtures/base';
+import { buildUser, UrlPattern } from '../data/test-data';
+import { readAccount } from '../fixtures/auth';
+import { submitRegistrationForm } from '../flows/signup-flow';
+import { submitLogin } from '../flows/login-flow';
 
 /**
  * DEFECT — signup does not enforce email uniqueness, and fails silently.
@@ -32,7 +32,7 @@ import { submitLogin } from './flows/login-flow';
  * itself to match a bug can no longer detect it.
  */
 test.describe('Signup — duplicate email (known defect) @known-defect', () => {
-  test('registering an already-used email surfaces a conflict message', async ({ steps }) => {
+  test('SGN-10 · registering an already-used email surfaces a conflict message', async ({ steps }) => {
     test.setTimeout(120_000);
     const existing = readAccount();
     const user = buildUser({ email: existing.email });
@@ -49,7 +49,7 @@ test.describe('Signup — duplicate email (known defect) @known-defect', () => {
     await steps.verifyPageContainsText(/already (registered|in use|exists)|email.*taken/i);
   });
 
-  test('a password set during a duplicate registration works at login', async ({ steps }) => {
+  test('SGN-11 · a password set during a duplicate registration works at login', async ({ steps }) => {
     test.setTimeout(120_000);
     const existing = readAccount();
     const user = buildUser({ email: existing.email });

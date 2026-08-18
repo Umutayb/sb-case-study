@@ -1,10 +1,10 @@
-import { test } from './fixtures/base';
-import { UrlPattern } from './fixtures/test-data';
-import { readAccount } from './fixtures/auth';
-import { submitLogin, dismissMfaPrompt, logInToDashboard } from './flows/login-flow';
+import { test } from '../fixtures/base';
+import { UrlPattern } from '../data/test-data';
+import { readAccount } from '../fixtures/auth';
+import { submitLogin, dismissMfaPrompt, logInToDashboard } from '../flows/login-flow';
 
 test.describe('Login', () => {
-  test('valid credentials reach the dashboard', async ({ steps }) => {
+  test('LGN-01 · valid credentials reach the dashboard', async ({ steps }) => {
     const { email, password } = readAccount();
 
     await logInToDashboard(steps, email, password);
@@ -13,7 +13,7 @@ test.describe('Login', () => {
     await steps.verifyPresence('myTimesheetsPanel', 'DashboardPage');
   });
 
-  test('login is offered multifactor authentication before the dashboard', async ({ steps }) => {
+  test('LGN-02 · login is offered multifactor authentication before the dashboard', async ({ steps }) => {
     const { email, password } = readAccount();
 
     await submitLogin(steps, email, password);

@@ -1,6 +1,6 @@
-import { test } from './fixtures/base';
-import { buildUser, Routes } from './fixtures/test-data';
-import { submitRegistrationForm } from './flows/signup-flow';
+import { test } from '../fixtures/base';
+import { buildUser, Routes } from '../data/test-data';
+import { submitRegistrationForm } from '../flows/signup-flow';
 
 const SIGNUP = 'SignupPage';
 const QUIZ = 'SignupQuestionnairePage';
@@ -35,7 +35,7 @@ const QUIZ = 'SignupQuestionnairePage';
 test.describe('Signup — form validation', () => {
   test.describe.configure({ timeout: 60_000 });
 
-  test('submitting the form empty blocks submission and marks every required field invalid', async ({
+  test('SGN-04 · submitting the form empty blocks submission and marks every required field invalid', async ({
     steps,
   }) => {
     await steps.navigateTo(Routes.SIGNUP, { waitUntil: 'domcontentloaded' });
@@ -60,7 +60,7 @@ test.describe('Signup — form validation', () => {
     await steps.verifyAbsence('businessName', QUIZ);
   });
 
-  test('an invalid email format is rejected with an inline "Invalid email" message', async ({
+  test('SGN-05 · an invalid email format is rejected with an inline "Invalid email" message', async ({
     steps,
   }) => {
     const user = buildUser({ email: 'not-an-email' });
@@ -73,7 +73,7 @@ test.describe('Signup — form validation', () => {
     await steps.verifyAbsence('businessName', QUIZ);
   });
 
-  test('a non-numeric phone number is rejected with an inline "Telephone number is invalid" message', async ({
+  test('SGN-06 · a non-numeric phone number is rejected with an inline "Telephone number is invalid" message', async ({
     steps,
   }) => {
     const user = buildUser({ mobileNumber: 'abc-not-a-phone' });
@@ -86,7 +86,7 @@ test.describe('Signup — form validation', () => {
     await steps.verifyAbsence('businessName', QUIZ);
   });
 
-  test('a weak password leaves the requirement checklist unmet and blocks submission', async ({
+  test('SGN-07 · a weak password leaves the requirement checklist unmet and blocks submission', async ({
     steps,
   }) => {
     // Satisfies "contains a number" and "contains a lowercase letter" but
@@ -103,7 +103,7 @@ test.describe('Signup — form validation', () => {
     await steps.verifyAbsence('businessName', QUIZ);
   });
 
-  test('an unticked terms checkbox blocks submission', async ({ steps }) => {
+  test('SGN-08 · an unticked terms checkbox blocks submission', async ({ steps }) => {
     const user = buildUser();
 
     await submitRegistrationForm(steps, user, { acceptTerms: false });

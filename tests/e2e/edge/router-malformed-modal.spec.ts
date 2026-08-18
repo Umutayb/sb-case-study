@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures/base';
+import { test, expect } from '../fixtures/base';
 
 /**
  * DEFECT — an unrecognised modal auxiliary route blanks the application.
@@ -24,7 +24,7 @@ import { test, expect } from './fixtures/base';
  * unauthenticated route performs.
  */
 test.describe('Router — unrecognised modal route @known-defect', () => {
-  test('an unknown modal auxiliary route does not blank the page', async ({ steps }) => {
+  test('RTR-01 · an unknown modal auxiliary route does not blank the page', async ({ steps }) => {
     await steps.navigateTo('/dashboard/my-overview(modal:does-not-exist)', {
       waitUntil: 'domcontentloaded',
     });

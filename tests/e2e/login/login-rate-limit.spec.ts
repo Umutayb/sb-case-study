@@ -1,8 +1,8 @@
-import { test, expect } from './fixtures/base';
-import { buildUser } from './fixtures/test-data';
-import { submitLogin } from './flows/login-flow';
-import { signUpToDashboard } from './flows/signup-flow';
-import { logOut } from './flows/login-flow';
+import { test, expect } from '../fixtures/base';
+import { buildUser } from '../data/test-data';
+import { submitLogin } from '../flows/login-flow';
+import { signUpToDashboard } from '../flows/signup-flow';
+import { logOut } from '../flows/login-flow';
 
 const LOGIN = 'LoginPage';
 
@@ -38,7 +38,7 @@ const FAILED_ATTEMPTS = 8;
 test.describe('Login — brute-force protection (known defect) @known-defect', () => {
   test.describe.configure({ mode: 'serial', timeout: 180_000 });
 
-  test('repeated failed logins are eventually throttled or locked out', async ({ steps }) => {
+  test('LGN-08 · repeated failed logins are eventually throttled or locked out', async ({ steps }) => {
     test.setTimeout(240_000);
 
     // Mint a disposable account so a real lockout, if one existed, could not

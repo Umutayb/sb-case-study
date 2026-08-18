@@ -70,8 +70,8 @@ dashboard).
 
 | Test | What it does | Why it earns a place |
 |---|---|---|
-| **a new trial account reaches the dashboard** | The full flow: registration → 8-step questionnaire → setup wizard → dashboard. Asserts the first-run dialog is genuinely dismissed, then that the dashboard panels render. | The flow the brief names — the suite's spine. |
-| **the registration form hands off to the questionnaire** | Submits registration and asserts the questionnaire content appears. | The handoff is invisible in the URL (`/signup` stays put), so it needs its own assertion rather than a URL check. |
+| `SGN-01` **a new trial account reaches the dashboard** | The full flow: registration → 8-step questionnaire → setup wizard → dashboard. Asserts the first-run dialog is genuinely dismissed, then that the dashboard panels render. | The flow the brief names — the suite's spine. |
+| `SGN-03` **the registration form hands off to the questionnaire** | Submits registration and asserts the questionnaire content appears. | The handoff is invisible in the URL (`/signup` stays put), so it needs its own assertion rather than a URL check. |
 | **the registration form is usable on a mobile viewport** `@mobile` | Loads registration at a Pixel-7 width and confirms the fields and CTA are usable. | Narrow-viewport layout is where signup forms break first. Deliberately not a full mobile questionnaire walk — that would double runtime to re-prove desktop logic. |
 
 ### Signup form validation — `signup-validation.spec.ts`
@@ -82,56 +82,56 @@ different per field, so the assertions target the reliable signal.
 
 | Test | Asserts |
 |---|---|
-| **submitting the form empty blocks submission and marks every required field invalid** | All six fields get `aria-invalid`; the form does not navigate. |
-| **an invalid email format is rejected with an inline "Invalid email" message** | Email validates on submit (not on blur) with the documented message. |
-| **a non-numeric phone number is rejected with an inline "Telephone number is invalid" message** | The one field that surfaces inline error text. |
-| **a weak password leaves the requirement checklist unmet and blocks submission** | Password has no text error — it renders a live five-item checklist; the test counts unmet items. |
-| **an unticked terms checkbox blocks submission** | A required legal consent that must not be bypassable *in the UI*. (The server does not enforce it — see finding A1.) |
+| `SGN-04` **submitting the form empty blocks submission and marks every required field invalid** | All six fields get `aria-invalid`; the form does not navigate. |
+| `SGN-05` **an invalid email format is rejected with an inline "Invalid email" message** | Email validates on submit (not on blur) with the documented message. |
+| `SGN-06` **a non-numeric phone number is rejected with an inline "Telephone number is invalid" message** | The one field that surfaces inline error text. |
+| `SGN-07` **a weak password leaves the requirement checklist unmet and blocks submission** | Password has no text error — it renders a live five-item checklist; the test counts unmet items. |
+| `SGN-08` **an unticked terms checkbox blocks submission** | A required legal consent that must not be bypassable *in the UI*. (The server does not enforce it — see finding A1.) |
 
 ### Signup questionnaire persistence — `signup-persistence.spec.ts`
 
 | Test | What it pins |
 |---|---|
-| **leaving the signup flow and returning discards questionnaire progress** | Navigating away and back loses all answers and returns to step 1. Pinned as *designed* behaviour, not a defect — not persisting half-entered credentials across an SPA exit is defensible, and the in-app `Back` button does preserve answers. If the product ever adds resume, this test notices. |
+| `SGN-09` **leaving the signup flow and returning discards questionnaire progress** | Navigating away and back loses all answers and returns to step 1. Pinned as *designed* behaviour, not a defect — not persisting half-entered credentials across an SPA exit is defensible, and the in-app `Back` button does preserve answers. If the product ever adds resume, this test notices. |
 
 ### Login — `login.spec.ts`
 
 | Test | What it does |
 |---|---|
-| **valid credentials reach the dashboard** | Logs in, passes through the MFA interstitial, lands on the dashboard, asserts the panels render. |
-| **login is offered multifactor authentication before the dashboard** | Asserts the `/login/mfa-promote` screen explicitly. It is part of the journey; if it vanished, login would have changed shape and a test should say so. |
+| `LGN-01` **valid credentials reach the dashboard** | Logs in, passes through the MFA interstitial, lands on the dashboard, asserts the panels render. |
+| `LGN-02` **login is offered multifactor authentication before the dashboard** | Asserts the `/login/mfa-promote` screen explicitly. It is part of the journey; if it vanished, login would have changed shape and a test should say so. |
 
 ### Login — rejected attempts — `login-negative.spec.ts`
 
 | Test | Asserts |
 |---|---|
-| **submitting an empty form reports both required fields** | Inline "Email is required" / "Password is required"; no navigation. |
-| **a wrong password is rejected** | The credentials error, still on `/login`. |
-| **an unknown email is rejected** | The same, from the other direction. |
-| **rejection does not reveal whether the account exists** | The strongest assertion in the suite: the wrong-password message and the unknown-account message are **byte-identical**, so the form cannot be used as an account-enumeration oracle. |
-| **a logged-out visitor cannot reach the dashboard directly** | Route guarding — a direct dashboard request while logged out redirects to `/login`. |
+| `LGN-03` **submitting an empty form reports both required fields** | Inline "Email is required" / "Password is required"; no navigation. |
+| `LGN-04` **a wrong password is rejected** | The credentials error, still on `/login`. |
+| `LGN-05` **an unknown email is rejected** | The same, from the other direction. |
+| `LGN-06` **rejection does not reveal whether the account exists** | The strongest assertion in the suite: the wrong-password message and the unknown-account message are **byte-identical**, so the form cannot be used as an account-enumeration oracle. |
+| `LGN-07` **a logged-out visitor cannot reach the dashboard directly** | Route guarding — a direct dashboard request while logged out redirects to `/login`. |
 
 ### Session — `session.spec.ts`
 
 | Test | Asserts |
 |---|---|
-| **an authenticated session survives a reload** | After a reload the dashboard still *renders* — not merely that the URL held, since the app could keep the route while dropping the session. |
-| **the dashboard exposes the primary navigation** | A cheap structural check that the landing surface really is the dashboard. |
+| `SES-01` **an authenticated session survives a reload** | After a reload the dashboard still *renders* — not merely that the URL held, since the app could keep the route while dropping the session. |
+| `SES-02` **the dashboard exposes the primary navigation** | A cheap structural check that the landing surface really is the dashboard. |
 
 ### Login — session & MFA-branch edges — `login-session-edges.spec.ts`
 
 | Test | Asserts |
 |---|---|
-| **"Back to login" on the MFA prompt silently terminates the session** | This button looks like a passive back-link but is a logout in disguise. Pinned precisely because it is surprising. |
+| `LGN-09` **"Back to login" on the MFA prompt silently terminates the session** | This button looks like a passive back-link but is a logout in disguise. Pinned precisely because it is surprising. |
 | **the login form is usable on a mobile viewport** `@mobile` | Same reasoning as signup's mobile check. |
-| **logging out of one session does not affect a concurrent session for the same account** | Documents the app's actual multi-session behaviour rather than assuming single-session semantics. Uses a dedicated minted account so it can't disturb sibling tests. |
-| **a session invalidated mid-interaction redirects to login instead of hanging or blanking** | Clears the session cookie, then triggers an API-bound action; the app redirects cleanly rather than freezing. (The session is cookie-only — `shifttime`, HttpOnly/Secure/SameSite=Strict — so clearing the cookie is a faithful stale-session simulation.) |
+| `LGN-11` **logging out of one session does not affect a concurrent session for the same account** | Documents the app's actual multi-session behaviour rather than assuming single-session semantics. Uses a dedicated minted account so it can't disturb sibling tests. |
+| `LGN-12` **a session invalidated mid-interaction redirects to login instead of hanging or blanking** | Clears the session cookie, then triggers an API-bound action; the app redirects cleanly rather than freezing. (The session is cookie-only — `shifttime`, HttpOnly/Secure/SameSite=Strict — so clearing the cookie is a faithful stale-session simulation.) |
 
 ### Account provisioning — `setup/account.setup.ts`
 
 | Test | What it does |
 |---|---|
-| **resolve an account for the login specs** | The `setup` project's single test — supplies the `.env` account, or mints one via the signup flow. Every login test depends on it. |
+| `SETUP-01` **resolve an account for the login specs** | The `setup` project's single test — supplies the `.env` account, or mints one via the signup flow. Every login test depends on it. |
 
 ---
 

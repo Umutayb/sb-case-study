@@ -1,5 +1,5 @@
 import type { Steps } from '@civitas-cerebrum/element-interactions';
-import { Routes, UrlPattern } from '../fixtures/test-data';
+import { Routes, UrlPattern } from '../data/test-data';
 
 const LOGIN = 'LoginPage';
 const MFA = 'MfaPromotePage';

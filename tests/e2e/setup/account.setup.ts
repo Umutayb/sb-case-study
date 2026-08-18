@@ -1,5 +1,5 @@
 import { test } from '../fixtures/base';
-import { ExistingAccount, buildUser } from '../fixtures/test-data';
+import { ExistingAccount, buildUser } from '../data/test-data';
 import { saveAccount } from '../fixtures/auth';
 import { signUpToDashboard } from '../flows/signup-flow';
 
@@ -11,7 +11,7 @@ import { signUpToDashboard } from '../flows/signup-flow';
  * just cloned the repo — the suite mints its own account by running the real
  * signup flow, so the run is still green without any local configuration.
  */
-test('resolve an account for the login specs', async ({ steps }) => {
+test('SETUP-01 · resolve an account for the login specs', async ({ steps }) => {
   test.setTimeout(180_000);
 
   if (ExistingAccount.isConfigured) {

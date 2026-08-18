@@ -1,6 +1,6 @@
-import { test } from './fixtures/base';
-import { buildUser, Routes, UrlPattern } from './fixtures/test-data';
-import { submitRegistrationForm } from './flows/signup-flow';
+import { test } from '../fixtures/base';
+import { buildUser, Routes, UrlPattern } from '../data/test-data';
+import { submitRegistrationForm } from '../flows/signup-flow';
 
 const QUIZ = 'SignupQuestionnairePage';
 const SIGNUP = 'SignupPage';
@@ -20,7 +20,7 @@ const SIGNUP = 'SignupPage';
  * product ever adds persistence, this test should be the thing that notices.
  */
 test.describe('Signup — questionnaire persistence', () => {
-  test('leaving the signup flow and returning discards questionnaire progress', async ({
+  test('SGN-09 · leaving the signup flow and returning discards questionnaire progress', async ({
     steps,
   }) => {
     test.setTimeout(120_000);
