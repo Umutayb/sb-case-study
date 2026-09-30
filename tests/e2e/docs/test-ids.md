@@ -6,8 +6,8 @@ targeted runs, for referring to a scenario in a bug report or a review, and for
 pointing at a case without quoting its whole sentence.
 
 Prefixes: `SETUP` account resolution · `SGN` signup and onboarding
-(`j-signup-onboard`) · `LGN` login (`j-login`) · `SES` post-login session ·
-`RTR` router edges.
+(`j-signup-onboard`) · `LGN` login (`j-login`) · `FPW` forgot password ·
+`SES` post-login session · `RTR` router edges.
 
 IDs are stable. A retired test keeps its ID retired rather than recycling it, so
 an ID in an old report never points at a different scenario later.
@@ -65,6 +65,11 @@ Two things worth knowing:
 | `LGN-10` | `login/login-session-edges.spec.ts` | mobile | the login form is usable on a mobile viewport `@mobile` |
 | `LGN-11` | `login/login-session-edges.spec.ts` | chromium | logging out of one session does not affect a concurrent session for the same account |
 | `LGN-12` | `login/login-session-edges.spec.ts` | chromium | a session invalidated mid-interaction redirects to login instead of hanging or blanking |
+| `FPW-01` | `login/forgot-password.spec.ts` | chromium | requesting a reset for a valid email shows a confirmation |
+| `FPW-02` | `login/forgot-password.spec.ts` | chromium | submitting the form empty reports email is required |
+| `FPW-03` | `login/forgot-password.spec.ts` | chromium | an invalid email format is rejected |
+| `FPW-04` | `login/forgot-password.spec.ts` | chromium | the response does not reveal whether the account exists |
+| `FPW-05` | `login/forgot-password.spec.ts` | chromium | "Back to login" returns to the login page |
 | `SES-01` | `edge/session.spec.ts` | chromium | an authenticated session survives a reload |
 | `SES-02` | `edge/session.spec.ts` | chromium | the dashboard exposes the primary navigation |
 | `RTR-01` | `edge/router-malformed-modal.spec.ts` | chromium | an unknown modal auxiliary route does not blank the page `@known-defect` |

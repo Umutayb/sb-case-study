@@ -408,6 +408,70 @@
           }
         }
       ]
+    },
+    {
+      "name": "ForgotPasswordPage",
+      "elements": [
+        {
+          "elementName": "heading",
+          "selector": {
+            "role": "heading",
+            "name": {
+              "regex": "Forgot your password",
+              "flags": "i"
+            }
+          }
+        },
+        {
+          "elementName": "email",
+          "selector": {
+            "role": "textbox",
+            "name": "Email address"
+          }
+        },
+        {
+          "elementName": "sendResetLinkButton",
+          "selector": {
+            "role": "button",
+            "name": "Send reset link"
+          }
+        },
+        {
+          "elementName": "backToLoginLink",
+          "selector": {
+            "role": "link",
+            "name": "Back to login"
+          }
+        },
+        {
+          "elementName": "emailRequiredError",
+          "selector": {
+            "text": "Email is required"
+          }
+        },
+        {
+          "elementName": "emailInvalidError",
+          "selector": {
+            "text": "Enter a valid email address"
+          }
+        },
+        {
+          "elementName": "confirmationHeading",
+          "selector": {
+            "role": "heading",
+            "name": {
+              "regex": "Check your email",
+              "flags": "i"
+            }
+          }
+        },
+        {
+          "elementName": "confirmationMessage",
+          "selector": {
+            "text": "We've sent you a link to reset your password"
+          }
+        }
+      ]
     }
   ]
 }
